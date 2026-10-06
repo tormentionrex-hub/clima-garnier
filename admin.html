@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Panel de Clima Garnier</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="marca.css">
+<style>
+body{background:#F3F5EE}
+.wrap{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:0 90px}
+/* inicio de sesión */
+.login{min-height:100%;display:grid;place-items:center;padding:24px 16px}
+.login form{width:100%;max-width:390px;background:var(--blanco);border-radius:18px;padding:32px 26px;display:flex;flex-direction:column;gap:16px;border-top:6px solid var(--verde);box-shadow:0 10px 30px rgba(0,60,64,.08)}
+.login img{width:120px}
+label.campo{display:flex;flex-direction:column;gap:6px;font-size:14px;min-width:0}
+.campo input,.campo select,.campo textarea,input.txt,select.txt,textarea.txt{border:1.5px solid var(--gris-linea);border-radius:10px;padding:11px 12px;background:var(--blanco);color:var(--petroleo);width:100%}
+.campo input:focus,input.txt:focus,select.txt:focus,textarea.txt:focus{outline:none;border-color:var(--verde);box-shadow:0 0 0 3px var(--verde-suave)}
+textarea.txt{resize:vertical;min-height:70px}
+.error{color:var(--rojo);font-size:14px;min-height:1em}
+/* botón gris "Editar aquí" */
+.editar{appearance:none;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;line-height:1;color:#7C7E78;background:#F1F2EE;border:1px dashed #BFC2BA;border-radius:999px;padding:5px 11px;cursor:pointer;white-space:nowrap;transition:all .2s;flex:none}
+.editar:hover,.editar:focus-visible{color:var(--petroleo);border-color:var(--verde);border-style:solid;background:var(--verde-suave)}
+.editar svg{flex:none}
+.etq{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--gris)}
+.etq b{font-weight:500;color:var(--petroleo)}
+.nota{font-size:13px;color:#7C7E78;margin:0}
+/* cabecera */
+header.cab{position:sticky;top:0;z-index:10;background:var(--blanco);border-bottom:1px solid var(--gris-claro);padding-top:env(safe-area-inset-top,0px)}
+.cab-in{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cab-in img{width:30px}
+.cab-tit{flex:1;min-width:180px;display:flex;flex-direction:column}
+.cab-tit label{font-size:11.5px;color:#7C7E78;letter-spacing:.06em;text-transform:uppercase}
+.cab-tit select{border:0;background:transparent;font-weight:500;color:var(--petroleo);font-size:16px;padding:2px 0;max-width:100%;cursor:pointer}
+.guardado{font-size:12.5px;color:var(--gris)}
+.cab-acc{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.estado-caja{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.estado-caja small{font-size:11.5px;color:#7C7E78}
+.estado{display:inline-flex;border:1.5px solid var(--gris-linea);border-radius:999px;overflow:hidden;font-size:13.5px}
+.estado button{border:0;background:transparent;padding:7px 12px;cursor:pointer;color:var(--gris)}
+.estado button.on{background:var(--petroleo);color:var(--blanco)}
+.estado button.on[data-e="abierta"]{background:var(--verde);color:var(--petroleo);font-weight:500}
+.tabs{display:flex;justify-content:center;gap:2px;max-width:1100px;margin:0 auto;overflow-x:auto}
+.tabs button{border:0;background:none;padding:10px 16px;cursor:pointer;color:var(--gris);border-bottom:3px solid transparent;font-weight:500;white-space:nowrap}
+.tabs button.on{color:var(--petroleo);border-bottom-color:var(--verde)}
+.badge{display:inline-grid;place-items:center;min-width:22px;height:20px;padding:0 6px;border-radius:999px;background:var(--verde-suave);color:var(--petroleo);font-size:12px;margin-left:4px;font-variant-numeric:tabular-nums}
+/* tarjetas */
+.tarjeta{background:var(--blanco);border-radius:14px;border:1px solid var(--gris-claro);margin-top:14px;position:relative;transition:box-shadow .2s,border-color .2s}
+.bloque{padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+.bloque h2{font-size:21px}
+.portadilla{border-top:8px solid var(--verde)}
+.guia{background:var(--verde-suave);border:1px solid var(--verde-medio);border-radius:14px;margin-top:16px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+.guia ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;color:var(--petroleo);display:flex;flex-direction:column;gap:4px}
+.guia .x{margin-left:auto}
+/* secciones */
+.sec{margin-top:28px;display:flex;flex-direction:column;gap:8px}
+.sec-cab{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sec-nombre{background:var(--petroleo);color:var(--blanco);font-size:13px;padding:6px 14px;border-radius:8px;letter-spacing:.03em}
+.sec-intro{font-size:13.5px;color:var(--gris);margin:0}
+.sec-ed{background:var(--blanco);border:1px solid var(--gris-claro);border-left:6px solid var(--petroleo);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+/* preguntas */
+.preg{padding:16px 20px;cursor:pointer}
+.preg:hover{border-color:var(--verde)}
+.preg.abierta{cursor:default;border-left:6px solid var(--verde);box-shadow:0 6px 20px rgba(0,60,64,.08);padding:20px}
+.preg .resumen{display:flex;gap:12px;align-items:flex-start}
+.preg .num{font-variant-numeric:tabular-nums;color:var(--gris);font-size:14px;min-width:28px;padding-top:2px}
+.preg .rt{flex:1;color:var(--petroleo);min-width:0}
+.preg .rt small{display:block;color:var(--gris);font-size:13px;margin-top:3px}
+.obl{color:var(--rojo)}
+.mini-ops{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-left:40px}
+.mini-ops span{font-size:12.5px;border:1px solid var(--gris-claro);border-radius:999px;padding:2px 10px}
+.editor{display:flex;flex-direction:column;gap:16px}
+.fila{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.fila>*{min-width:0}
+.grow{flex:1 1 260px}
+textarea.titq{font-size:17px;min-height:56px;background:#F7F8F4}
+.ops-ed{display:flex;flex-direction:column;gap:8px}
+.op-ed{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.op-ed .marca{width:18px;height:18px;border:1.5px solid #C9CBC4;border-radius:50%;flex:none}
+.op-ed.cuadro .marca{border-radius:4px}
+.op-ed input.txt{flex:1 1 180px;padding:8px 10px}
+.op-ed select.txt{flex:1 1 220px;padding:7px 8px;font-size:13.5px}
+.ico{border:0;background:none;cursor:pointer;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--gris);flex:none}
+.ico:hover{background:var(--gris-claro);color:var(--petroleo)}
+.ico[disabled]{opacity:.3;cursor:default;background:none}
+.pie-ed{display:flex;align-items:center;gap:8px;border-top:1px solid var(--gris-claro);padding-top:14px;flex-wrap:wrap}
+.pie-ed .sep{flex:1}
+.btn.sm{padding:7px 11px;font-size:13.5px}
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:14px}
+.switch input{appearance:none;width:38px;height:22px;border-radius:999px;background:var(--gris-linea);position:relative;cursor:pointer;transition:background .2s;margin:0;flex:none}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--blanco);transition:transform .2s var(--ease)}
+.switch input:checked{background:var(--verde)}
+.switch input:checked::after{transform:translateX(16px)}
+.confirmar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#FBEDEA;border-radius:10px;padding:10px 12px;font-size:14px;color:var(--rojo)}
+.agregar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:20px}
+.menu-tipos{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:10px}
+.menu-tipos button{border:1.5px solid var(--gris-linea);background:var(--blanco);border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;font-size:14px;color:var(--petroleo);display:flex;flex-direction:column;gap:2px}
+.menu-tipos button small{color:var(--gris);font-size:12px}
+.menu-tipos button:hover{border-color:var(--verde);background:var(--verde-suave)}
+/* áreas */
+.area-fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--gris-claro)}
+.area-fila input.txt{flex:1 1 200px;padding:9px 10px}
+/* respuestas */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:16px}
+.kpi{background:var(--blanco);border:1px solid var(--gris-claro);border-radius:14px;padding:16px}
+.kpi strong{display:block;font-size:30px;font-weight:400;color:var(--petroleo);font-variant-numeric:tabular-nums}
+.kpi span{font-size:13px}
+.barra-acc{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:16px}
+.res{padding:18px 20px}
+.res h3{font-size:18px;font-weight:400;margin-bottom:4px}
+.res .meta{font-size:13px;margin:0 0 12px}
+.bar{display:grid;grid-template-columns:minmax(110px,38%) 1fr 72px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.bar .et{color:var(--petroleo);overflow-wrap:anywhere}
+.bar .tr{height:14px;background:var(--gris-claro);border-radius:7px;overflow:hidden}
+.bar .tr i{display:block;height:100%;background:var(--verde);border-radius:7px}
+.bar .vl{font-variant-numeric:tabular-nums;text-align:right;font-size:13px}
+.nps-box{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.nps-box div{background:var(--verde-suave);border-radius:10px;padding:8px 12px;font-size:13px}
+.nps-box b{display:block;font-size:20px;font-weight:500;color:var(--petroleo);font-variant-numeric:tabular-nums}
+.textos{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow:auto}
+.textos p{margin:0;background:#F7F8F4;border-radius:8px;padding:8px 12px;font-size:14px;color:var(--petroleo)}
+.tabla{overflow-x:auto}
+.tabla table{border-collapse:collapse;width:100%;font-size:14px}
+.tabla th,.tabla td{padding:8px 10px;border-bottom:1px solid var(--gris-claro);text-align:left;vertical-align:top}
+.tabla td.n{text-align:right;font-variant-numeric:tabular-nums}
+.una{border-bottom:1px solid var(--gris-claro);padding:10px 0}
+.una-cab{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}
+.una-cab span{flex:1;min-width:160px;color:var(--petroleo)}
+.una dl{margin:10px 0 0;display:grid;grid-template-columns:minmax(0,1fr);gap:4px;font-size:13.5px}
+.una dt{color:var(--gris)}
+.una dd{margin:0 0 6px;color:var(--petroleo);font-weight:500}
+/* compartir */
+.modal-fondo{position:fixed;inset:0;background:rgba(0,40,43,.45);z-index:20;display:grid;place-items:start center;overflow:auto;padding:30px 12px}
+.modal{background:var(--blanco);border-radius:18px;max-width:780px;width:100%;padding:24px;display:flex;flex-direction:column;gap:16px}
+.modal-cab{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.link-gen{display:flex;gap:8px;flex-wrap:wrap}
+.link-gen input{flex:1 1 260px}
+.areas{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.area{border:1px solid var(--gris-claro);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}
+.area .qr{width:150px;height:150px;display:grid;place-items:center}
+.area .qr img,.area .qr canvas{width:150px!important;height:150px!important}
+.area b{color:var(--petroleo);font-weight:500}
+.area .acc{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--petroleo);color:var(--blanco);padding:11px 18px;border-radius:12px;font-size:14px;opacity:0;transition:all .3s var(--ease);z-index:30;pointer-events:none;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.vacio{text-align:center;padding:40px 20px;color:var(--gris)}
+@media (max-width:560px){.bar{grid-template-columns:1fr 64px}.bar .tr{grid-column:1/-1;grid-row:2}.pie-ed .sep{display:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="config.js"></script>
+<script>
+"use strict";
+const sb=supabase.createClient(CLIMA_CONFIG.url,CLIMA_CONFIG.key);
+const $=s=>document.querySelector(s);
+const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LIKERT=["Totalmente de acuerdo","De acuerdo","Indiferente","En desacuerdo","Totalmente en desacuerdo"];
+const EMOCIONES=["Feliz","Comprometido","Motivado","Satisfecho","Indiferente","Decepcionado","Frustrado","Aburrido","Estresado","Enfadado"];
+const TIPOS={
+  opcion:["Elegir una opción","La persona marca una sola respuesta"],
+  multiple:["Elegir varias opciones","Puede marcar más de una"],
+  likert:["De acuerdo / en desacuerdo","Escala de 5 puntos con Indiferente al centro"],
+  escala:["Calificación del 1 al 10","Números para calificar, por ejemplo la recomendación"],
+  emociones:["Emociones","Tarjetas con caritas para elegir cómo se siente"],
+  abierta:["Respuesta escrita","La persona escribe con sus propias palabras"]
+};
+const LAPIZ='<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M10.5 2.5 13.5 5.5 5.5 13.5H2.5V10.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+const ICO={
+  arriba:'<svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M9 14V4m-4 4 4-4 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  abajo:'<svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M9 4v10m-4-4 4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  copiar:'<svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="6" y="6" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 12V4a1 1 0 0 1 1-1h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  borrar:'<svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M4 5h10m-7 0V3.5h4V5m-6 0 .6 9.5h6.8L13 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  x:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+};
+const editar=(foco,texto="Editar aquí")=>`<button type="button" class="editar" data-foco="${foco}">${LAPIZ} ${texto}</button>`;
+const etiqueta=(texto,foco,ayuda="")=>`<div class="etq"><span><b>${texto}</b>${ayuda?` · ${ayuda}`:""}</span>${editar(foco)}</div>`;
+
+let S={user:null,encuestas:[],E:null,P:[],U:[],R:[],tab:"preguntas",abierta:null,menuTipos:null,borrar:null,filtro:"",secEd:null,verResp:null};
+
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),2800)}
+function guardando(estado){const g=$("#guardado");if(g)g.textContent=estado}
+function fallo(err,txt="No se pudo guardar"){console.error(err);toast(txt+". Revisa tu conexión e inténtalo de nuevo.");guardando("No se guardó el último cambio")}
+const slugify=s=>String(s).normalize("NFKD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"area";
+const baseURL=()=>location.href.replace(/admin\.html.*$/,"").replace(/[?#].*$/,"");
+const cfgE=()=>{if(!S.E.config)S.E.config={};return S.E.config};
+function leer(k){try{return localStorage.getItem(k)}catch{return null}}
+function escribir(k,v){try{localStorage.setItem(k,v)}catch{}}
+
+/* Botón "Editar aquí": lleva el cursor al campo y selecciona el texto */
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".editar[data-foco]");if(!b)return;
+  e.stopPropagation();
+  const f=b.dataset.foco;
+  if(f.startsWith("preg:")){abrirPregunta(f.slice(5));return}
+  if(f.startsWith("sec:")){S.secEd=f.slice(4);S.abierta=null;pintarPreguntas();const i=$("#sec-nombre");if(i){i.focus();i.select()}return}
+  const el=document.getElementById(f);if(el){el.focus();if(el.select)el.select();el.scrollIntoView({block:"center",behavior:"smooth"})}
+},true);
+
+/* ===================== sesión ===================== */
+async function iniciar(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session) return entrar(session.user);
+  pantallaLogin();
+}
+function pantallaLogin(msg=""){
+  $("#app").innerHTML=`<div class="login"><form id="f-login" novalidate>
+    <img src="logo.png" alt="Garnier, Enhancing Land">
+    <div><div class="eyebrow">Encuesta de clima</div><h1 style="font-size:26px;margin-top:6px">Panel de administración</h1></div>
+    <label class="campo">Correo<input id="l-correo" type="email" autocomplete="username" required></label>
+    <label class="campo">Contraseña<input id="l-clave" type="password" autocomplete="current-password" required></label>
+    <div class="error" id="l-error">${esc(msg)}</div>
+    <button class="cta" type="submit">Entrar</button>
+  </form></div><div class="barra-marca"></div>`;
+  $("#f-login").onsubmit=async e=>{
+    e.preventDefault();const b=e.target.querySelector("button");b.disabled=true;b.textContent="Entrando…";
+    const {data,error}=await sb.auth.signInWithPassword({email:$("#l-correo").value.trim(),password:$("#l-clave").value});
+    if(error){b.disabled=false;b.textContent="Entrar";$("#l-error").textContent=/invalid/i.test(error.message)?"Correo o contraseña incorrectos.":"No se pudo entrar: "+error.message;return}
+    entrar(data.user);
+  };
+}
+async function entrar(user){
+  const {data,error}=await sb.from("admins").select("email").limit(1);
+  if(error||!data||!data.length){await sb.auth.signOut();return pantallaLogin("Esta cuenta no tiene acceso al panel.")}
+  S.user=user;await cargarEncuestas();
+}
+async function salir(){await sb.auth.signOut();S.user=null;S.E=null;pantallaLogin()}
+
+/* ===================== datos ===================== */
+async function cargarEncuestas(idPreferida){
+  const {data,error}=await sb.from("encuestas").select("*").order("creada_en",{ascending:false});
+  if(error) return fallo(error,"No se pudieron cargar las encuestas");
+  S.encuestas=data||[];
+  const id=idPreferida||(S.E&&S.encuestas.some(e=>e.id===S.E.id)&&S.E.id)||(S.encuestas[0]&&S.encuestas[0].id);
+  if(!id){S.E=null;return pintar()}
+  await abrirEncuesta(id);
+}
+async function abrirEncuesta(id){
+  S.E=S.encuestas.find(e=>e.id===id);S.abierta=null;S.menuTipos=null;S.borrar=null;S.secEd=null;S.verResp=null;S.filtro="";
+  const [p,u,r]=await Promise.all([
+    sb.from("preguntas").select("*").eq("encuesta_id",id).order("orden"),
+    sb.from("unidades").select("*").eq("encuesta_id",id).order("orden"),
+    sb.from("respuestas").select("*").eq("encuesta_id",id).order("enviada_en",{ascending:false})
+  ]);
+  if(p.error||u.error||r.error) return fallo(p.error||u.error||r.error,"No se pudo cargar la encuesta");
+  S.P=p.data;S.U=u.data;S.R=r.data;pintar();
+}
+const pendientes={};
+function guardarCampo(tabla,id,cambios,ms=600){
+  guardando("Guardando…");
+  const k=tabla+id;pendientes[k]={...(pendientes[k]||{}),...cambios};
+  clearTimeout(pendientes[k+"t"]);
+  pendientes[k+"t"]=setTimeout(async()=>{
+    const c=pendientes[k];delete pendientes[k];
+    if(tabla!=="unidades") c.actualizada_en=new Date().toISOString();
+    const {error}=await sb.from(tabla).update(c).eq("id",id);
+    if(error) return fallo(error);
+    guardando("Todos los cambios se guardaron");
+  },ms);
+}
+function guardarConfig(){guardarCampo("encuestas",S.E.id,{config:JSON.parse(JSON.stringify(cfgE()))})}
+async function renumerar(){
+  const cambios=S.P.map((p,i)=>({p,i:i+1})).filter(x=>x.p.orden!==x.i);
+  cambios.forEach(x=>x.p.orden=x.i);
+  if(!cambios.length)return;
+  guardando("Guardando…");
+  const res=await Promise.all(cambios.map(x=>sb.from("preguntas").update({orden:x.i}).eq("id",x.p.id)));
+  const e=res.find(x=>x.error);if(e) return fallo(e.error);
+  guardando("Todos los cambios se guardaron");
+}
+
+/* ===================== estructura general ===================== */
+function pintar(){
+  if(!S.E){
+    $("#app").innerHTML=cabecera()+`<div class="wrap"><div class="tarjeta vacio"><h2>No hay encuestas todavía</h2><p>Crea la primera para empezar.</p><button class="cta" data-nueva>Crear encuesta</button></div></div>`;
+    enlazarCab();return;
+  }
+  $("#app").innerHTML=cabecera()+`<div class="wrap" id="cuerpo"></div>`;
+  enlazarCab();
+  ({preguntas:pintarPreguntas,mensajes:pintarMensajes,respuestas:pintarRespuestas})[S.tab]();
+}
+function cabecera(){
+  const E=S.E;
+  const ayudaEstado={borrador:"Nadie puede responder todavía",abierta:"El personal ya puede responder",cerrada:"Ya no recibe respuestas"};
+  return `<header class="cab"><div class="cab-in">
+    <img src="isotipo.png" alt="Garnier">
+    <div class="cab-tit">
+      <label for="sel-enc">Encuesta</label>
+      <select id="sel-enc">${S.encuestas.map(e=>`<option value="${e.id}" ${E&&e.id===E.id?"selected":""}>${esc(e.titulo)}</option>`).join("")}<option value="__nueva">+ Crear otra encuesta…</option></select>
+      <span class="guardado" id="guardado">${E?"Todos los cambios se guardaron":""}</span>
+    </div>
+    ${E?`<div class="estado-caja"><div class="estado" role="group" aria-label="Estado de la encuesta">${["borrador","abierta","cerrada"].map(s=>`<button data-e="${s}" class="${E.estado===s?"on":""}">${{borrador:"Borrador",abierta:"Abierta",cerrada:"Cerrada"}[s]}</button>`).join("")}</div><small>${ayudaEstado[E.estado]}</small></div>
+    <div class="cab-acc">
+      <a class="btn" href="index.html?previa=${E.id}" target="_blank" rel="noopener">Ver como el personal</a>
+      <button class="btn" data-compartir>Compartir</button>
+      <button class="btn" data-salir>Salir</button>
+    </div>`:`<button class="btn" data-salir>Salir</button>`}
+  </div>
+  ${E?`<nav class="tabs"><button data-tab="preguntas" class="${S.tab==="preguntas"?"on":""}">Preguntas</button><button data-tab="mensajes" class="${S.tab==="mensajes"?"on":""}">Mensajes y áreas</button><button data-tab="respuestas" class="${S.tab==="respuestas"?"on":""}">Respuestas<span class="badge">${S.R.length}</span></button></nav>`:""}
+  </header>`;
+}
+function enlazarCab(){
+  document.querySelectorAll("[data-salir]").forEach(b=>b.onclick=salir);
+  document.querySelectorAll("[data-nueva]").forEach(b=>b.onclick=()=>dialogoNueva());
+  const sel=$("#sel-enc");if(sel)sel.onchange=()=>{if(sel.value==="__nueva"){sel.value=S.E?S.E.id:"";dialogoNueva()}else abrirEncuesta(sel.value)};
+  document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;S.borrar=null;pintar()});
+  document.querySelectorAll(".estado button").forEach(b=>b.onclick=()=>cambiarEstado(b.dataset.e));
+  const c=document.querySelector("[data-compartir]");if(c)c.onclick=compartir;
+}
+async function cambiarEstado(estado){
+  const E=S.E;if(E.estado===estado)return;
+  if(estado==="abierta"){
+    for(const o of S.encuestas.filter(e=>e.id!==E.id&&e.estado==="abierta")){await sb.from("encuestas").update({estado:"cerrada"}).eq("id",o.id);o.estado="cerrada"}
+  }
+  const {error}=await sb.from("encuestas").update({estado,actualizada_en:new Date().toISOString()}).eq("id",E.id);
+  if(error) return fallo(error);
+  E.estado=estado;pintar();
+  toast(estado==="abierta"?"La encuesta está abierta: el personal ya puede responder.":estado==="cerrada"?"La encuesta está cerrada: ya no recibe respuestas.":"La encuesta volvió a borrador.");
+}
+
+/* ===================== crear otra encuesta ===================== */
+function dialogoNueva(){
+  const f=document.createElement("div");f.className="modal-fondo";
+  f.innerHTML=`<div class="modal" role="dialog" aria-label="Crear otra encuesta"><div class="modal-cab"><h2>Crear otra encuesta</h2><button class="ico" data-cerrar aria-label="Cerrar">${ICO.x}</button></div>
+    <label class="campo">Nombre de la nueva encuesta<input id="n-tit" class="txt" value="Encuesta de Clima Organizacional ${new Date().getFullYear()+1}"></label>
+    <div class="fila">${S.E?`<button class="cta" data-dup>Copiar todo de "${esc(S.E.titulo)}"</button>`:""}<button class="btn" data-blanco>Empezar en blanco</button></div>
+    <p class="nota">Copiar es lo más práctico para el año siguiente: se mantienen las preguntas, los mensajes y las áreas, y empiezas sin respuestas. Después puedes cambiar lo que quieras.</p></div>`;
+  document.body.appendChild(f);
+  f.querySelector("[data-cerrar]").onclick=()=>f.remove();
+  f.onclick=e=>{if(e.target===f)f.remove()};
+  const dup=f.querySelector("[data-dup]");if(dup)dup.onclick=()=>{const t=f.querySelector("#n-tit").value;f.remove();nuevaEncuesta(true,t)};
+  f.querySelector("[data-blanco]").onclick=()=>{const t=f.querySelector("#n-tit").value;f.remove();nuevaEncuesta(false,t)};
+}
+async function nuevaEncuesta(copiar,titulo){
+  titulo=(titulo||"Nueva encuesta").trim();
+  guardando("Creando…");
+  const fila={titulo,descripcion:copiar&&S.E?S.E.descripcion:"",estado:"borrador"};
+  if(copiar&&S.E&&S.E.config) fila.config=S.E.config;
+  const {data:e,error}=await sb.from("encuestas").insert(fila).select().single();
+  if(error) return fallo(error,"No se pudo crear la encuesta");
+  if(copiar&&S.E){
+    if(S.P.length){
+      const filas=S.P.map(p=>({encuesta_id:e.id,orden:p.orden,seccion:p.seccion,descripcion_seccion:p.descripcion_seccion,tipo:p.tipo,titulo:p.titulo,ayuda:p.ayuda,opciones:p.opciones,obligatoria:p.obligatoria,config:{...p.config,saltos:undefined}}));
+      const {data:nuevas,error:e2}=await sb.from("preguntas").insert(filas).select();
+      if(e2) return fallo(e2);
+      const mapa={};S.P.forEach(p=>{const n=nuevas.find(x=>x.orden===p.orden);if(n)mapa[p.id]=n.id});
+      for(const p of S.P){const s=p.config&&p.config.saltos;if(s&&Object.keys(s).length){const ns={};for(const k in s)if(mapa[s[k]])ns[k]=mapa[s[k]];const n=nuevas.find(x=>x.orden===p.orden);await sb.from("preguntas").update({config:{...n.config,saltos:ns}}).eq("id",n.id)}}
+    }
+    if(S.U.length) await sb.from("unidades").insert(S.U.map(u=>({encuesta_id:e.id,slug:u.slug,nombre:u.nombre,orden:u.orden})));
+  }
+  S.tab="preguntas";await cargarEncuestas(e.id);toast("Encuesta creada en borrador.");
+}
+
+/* ===================== PREGUNTAS ===================== */
+function guiaHTML(){
+  if(leer("clima-guia-oculta")==="1")return "";
+  return `<div class="guia"><div><b style="color:var(--petroleo)">Así funciona este panel</b><ul>
+    <li>Todo lo que tiene el botón gris <b>✎ Editar aquí</b> se puede cambiar. Toca el botón o el texto directamente.</li>
+    <li>Los cambios se guardan solos. Arriba verás "Todos los cambios se guardaron".</li>
+    <li>Para revisar cómo lo verá el personal, toca <b>Ver como el personal</b>.</li>
+    <li>Cuando esté lista, cambia el estado a <b>Abierta</b> y comparte el enlace o los QR desde <b>Compartir</b>.</li>
+  </ul></div><button class="ico x" data-ocultar-guia aria-label="Ocultar esta guía">${ICO.x}</button></div>`;
+}
+function secciones(){const s=[];S.P.forEach(p=>{if(p.seccion&&!s.includes(p.seccion))s.push(p.seccion)});return s}
+function pintarPreguntas(){
+  const E=S.E;const c=$("#cuerpo");if(!c)return;
+  let html=guiaHTML()+`<div class="tarjeta portadilla bloque">
+      ${etiqueta("Título de la encuesta","e-tit","lo ve el personal al empezar")}
+      <input class="txt" id="e-tit" value="${esc(E.titulo)}" style="font-size:22px;font-weight:300">
+      ${etiqueta("Mensaje de bienvenida","e-desc","explica para qué es la encuesta")}
+      <textarea class="txt" id="e-desc" placeholder="Escribe aquí el mensaje de bienvenida">${esc(E.descripcion||"")}</textarea>
+      ${S.R.length?`<p class="nota">Esta encuesta ya tiene ${S.R.length} respuesta${S.R.length===1?"":"s"}. Si cambias o eliminas preguntas, las respuestas que ya llegaron se conservan.</p>`:""}
+    </div>`;
+  let secAnt=null;
+  S.P.forEach((p,i)=>{
+    const s=p.seccion||"";
+    if(s!==secAnt){secAnt=s;if(s)html+=seccionHTML(s)}
+    html+=S.abierta===p.id?editorHTML(p,i):resumenHTML(p,i);
+    if(S.menuTipos===i) html+=menuTiposHTML(i);
+  });
+  if(!S.P.length) html+=`<div class="tarjeta vacio">Todavía no hay preguntas. Agrega la primera con el botón de abajo.</div>`;
+  html+=`<div class="agregar"><button class="cta" data-agregar="${S.P.length-1}">+ Agregar pregunta</button><button class="btn" data-nueva-seccion>+ Agregar sección</button></div>`;
+  if(S.menuTipos===-1) html+=menuTiposHTML(-1);
+  c.innerHTML=html;
+  $("#e-tit").oninput=e=>{E.titulo=e.target.value;guardarCampo("encuestas",E.id,{titulo:E.titulo});const o=$("#sel-enc option[value='"+E.id+"']");if(o)o.textContent=E.titulo};
+  $("#e-desc").oninput=e=>{E.descripcion=e.target.value;guardarCampo("encuestas",E.id,{descripcion:E.descripcion})};
+  const og=c.querySelector("[data-ocultar-guia]");if(og)og.onclick=()=>{escribir("clima-guia-oculta","1");pintarPreguntas()};
+  c.querySelectorAll(".preg[data-id]:not(.abierta)").forEach(el=>{el.onclick=()=>abrirPregunta(el.dataset.id);el.onkeydown=e=>{if(e.key==="Enter")abrirPregunta(el.dataset.id)}});
+  c.querySelectorAll("[data-agregar]").forEach(b=>b.onclick=e=>{e.stopPropagation();const i=+b.dataset.agregar;S.menuTipos=S.menuTipos===i?null:i;pintarPreguntas();const m=document.querySelector(".menu-tipos");if(m)m.scrollIntoView({block:"nearest",behavior:"smooth"})});
+  c.querySelectorAll("[data-tipo-nuevo]").forEach(b=>b.onclick=()=>agregarPregunta(+b.dataset.pos,b.dataset.tipoNuevo));
+  const ns=c.querySelector("[data-nueva-seccion]");if(ns)ns.onclick=nuevaSeccion;
+  const ed=c.querySelector(".preg.abierta");if(ed)enlazarEditor(ed);
+  const se=c.querySelector(".sec-ed");if(se)enlazarSeccion(se);
+}
+function abrirPregunta(id){S.abierta=id;S.menuTipos=null;S.borrar=null;S.secEd=null;pintarPreguntas();const a=document.querySelector(".preg.abierta");if(a){a.scrollIntoView({block:"nearest",behavior:"smooth"});const t=a.querySelector("[data-titulo]");if(t)t.focus()}}
+
+/* --- secciones --- */
+function seccionHTML(s){
+  const intro=(cfgE().secciones||{})[s]||"";
+  const n=S.P.filter(p=>p.seccion===s).length;
+  if(S.secEd===s) return `<div class="sec"><div class="sec-ed" data-sec="${esc(s)}">
+    ${etiqueta("Nombre de la sección","sec-nombre","aparece como título antes de sus preguntas")}
+    <input class="txt" id="sec-nombre" value="${esc(s)}">
+    ${etiqueta("Texto de introducción","sec-intro","opcional, lo ve el personal al entrar a la sección")}
+    <textarea class="txt" id="sec-intro" placeholder="Por ejemplo: Cuéntanos cómo vives el liderazgo en tu área.">${esc(intro)}</textarea>
+    ${S.borrar==="sec:"+s?`<div class="confirmar">¿Quitar la sección? Sus ${n} preguntas se conservan, solo dejan de estar agrupadas. <button class="btn peligro sm" data-sec-quitar-si>Sí, quitar</button><button class="btn sm" data-sec-quitar-no>Cancelar</button></div>`:""}
+    <div class="pie-ed"><button class="btn sm peligro" data-sec-quitar>${ICO.borrar} Quitar sección</button><span class="sep"></span><button class="cta" data-sec-listo>Listo</button></div>
+  </div></div>`;
+  return `<div class="sec"><div class="sec-cab"><span class="sec-nombre">${esc(s)}</span>${editar("sec:"+s,"Editar sección")}</div>${intro?`<p class="sec-intro">${esc(intro)}</p>`:""}</div>`;
+}
+function enlazarSeccion(el){
+  const viejo=S.secEd;
+  const nombre=$("#sec-nombre"),intro=$("#sec-intro");
+  intro.oninput=()=>{const c=cfgE();c.secciones={...(c.secciones||{})};c.secciones[S.secEd]=intro.value;guardarConfig()};
+  const renombrar=async()=>{
+    const nuevo=nombre.value.trim();if(!nuevo||nuevo===S.secEd)return;
+    const actual=S.secEd;const afectadas=S.P.filter(p=>p.seccion===actual);
+    afectadas.forEach(p=>p.seccion=nuevo);
+    const c=cfgE();c.secciones={...(c.secciones||{})};if(c.secciones[actual]!==undefined){c.secciones[nuevo]=c.secciones[actual];delete c.secciones[actual]}
+    S.secEd=nuevo;guardando("Guardando…");
+    const res=await Promise.all(afectadas.map(p=>sb.from("preguntas").update({seccion:nuevo}).eq("id",p.id)));
+    const e=res.find(x=>x.error);if(e)return fallo(e.error);
+    guardarConfig();
+  };
+  nombre.onchange=renombrar;
+  el.querySelector("[data-sec-listo]").onclick=async()=>{await renombrar();S.secEd=null;S.borrar=null;pintarPreguntas()};
+  el.querySelector("[data-sec-quitar]").onclick=()=>{S.borrar="sec:"+viejo;pintarPreguntas()};
+  const si=el.querySelector("[data-sec-quitar-si]");if(si)si.onclick=async()=>{
+    const af=S.P.filter(p=>p.seccion===viejo);af.forEach(p=>p.seccion=null);
+    const res=await Promise.all(af.map(p=>sb.from("preguntas").update({seccion:null}).eq("id",p.id)));
+    const e=res.find(x=>x.error);if(e)return fallo(e.error);
+    const c=cfgE();if(c.secciones){c.secciones={...c.secciones};delete c.secciones[viejo];guardarConfig()}
+    S.secEd=null;S.borrar=null;pintarPreguntas();toast("Sección quitada. Las preguntas se conservaron.");
+  };
+  const no=el.querySelector("[data-sec-quitar-no]");if(no)no.onclick=()=>{S.borrar=null;pintarPreguntas()};
+}
+async function nuevaSeccion(){
+  let nombre="Nueva sección";let k=2;while(secciones().includes(nombre))nombre="Nueva sección "+k++;
+  await insertarPregunta(S.P.length-1,{...plantilla("likert"),seccion:nombre});
+  S.secEd=nombre;S.abierta=null;pintarPreguntas();
+  const i=$("#sec-nombre");if(i){i.focus();i.select();i.scrollIntoView({block:"center"})}
+  toast("Sección creada con una primera pregunta. Ponle nombre.");
+}
+
+/* --- preguntas --- */
+function resumenHTML(p,i){
+  const ops=Array.isArray(p.opciones)?p.opciones:[];
+  const saltos=p.config&&p.config.saltos?Object.keys(p.config.saltos).length:0;
+  let detalle=(TIPOS[p.tipo]||[p.tipo])[0];
+  if(p.tipo==="escala") detalle=`Calificación del ${p.config.min??1} al ${p.config.max??10}${p.config.nps?" · se usa para el NPS":""}`;
+  if(saltos) detalle+=` · lleva a otra pregunta según la respuesta`;
+  if(!p.obligatoria) detalle+=" · opcional";
+  return `<div class="tarjeta preg" data-id="${p.id}" tabindex="0"><div class="resumen"><span class="num">${i+1}.</span><div class="rt">${esc(p.titulo)}${p.obligatoria?' <span class="obl" title="Obligatoria">*</span>':""}<small>${esc(detalle)}</small></div>${editar("preg:"+p.id)}</div>
+    ${ops.length&&p.tipo!=="likert"?`<div class="mini-ops">${ops.slice(0,6).map(o=>`<span>${esc(o)}</span>`).join("")}${ops.length>6?`<span>+${ops.length-6} más</span>`:""}</div>`:""}</div>`;
+}
+function menuTiposHTML(i){
+  return `<div class="tarjeta bloque"><b style="color:var(--petroleo)">¿Qué tipo de pregunta quieres agregar?</b><div class="menu-tipos">${Object.entries(TIPOS).map(([k,[t,d]])=>`<button data-tipo-nuevo="${k}" data-pos="${i}">${t}<small>${d}</small></button>`).join("")}</div></div>`;
+}
+function editorHTML(p,i){
+  const ops=Array.isArray(p.opciones)?p.opciones:[];
+  const conOps=["opcion","multiple","likert","emociones"].includes(p.tipo);
+  const saltos=(p.config&&p.config.saltos)||{};
+  const usaSaltos=p.tipo==="opcion"||p.tipo==="likert";
+  const conSaltos=usaSaltos&&(p.config&&p.config.bifurcacion||Object.keys(saltos).length>0);
+  const destinos=S.P.map((q,k)=>({q,k})).filter(x=>x.k>i);
+  const secs=secciones();
+  let cuerpo="";
+  if(conOps){
+    cuerpo=`${etiqueta("Opciones de respuesta","op-"+p.id+"-0","toca cualquier opción para cambiarla")}
+      ${conSaltos?`<p class="nota">A la derecha de cada opción elige a qué pregunta pasa la persona si la marca.</p>`:""}
+      <div class="ops-ed">${ops.map((o,k)=>`<div class="op-ed ${p.tipo==="multiple"?"cuadro":""}"><span class="marca"></span>
+      <input class="txt" id="op-${p.id}-${k}" data-op="${k}" value="${esc(o)}" aria-label="Opción ${k+1}">
+      ${conSaltos?`<select class="txt" data-salto="${k}" aria-label="Si marca esta opción"><option value="">Sigue con la próxima pregunta</option>${destinos.map(d=>`<option value="${d.q.id}" ${saltos[o]===d.q.id?"selected":""}>Pasa a la ${d.k+1}. ${esc(d.q.titulo.slice(0,46))}</option>`).join("")}</select>`:""}
+      <button class="ico" data-op-arriba="${k}" ${k===0?"disabled":""} aria-label="Subir opción" title="Subir opción">${ICO.arriba}</button>
+      <button class="ico" data-op-borrar="${k}" aria-label="Quitar opción" title="Quitar opción">${ICO.x}</button></div>`).join("")}
+      <div class="op-ed"><span class="marca" style="opacity:.4"></span><button class="btn sm" data-op-agregar>+ Agregar opción</button>${p.tipo==="likert"?'<button class="link" data-likert>Volver a la escala estándar de 5 puntos</button>':""}</div></div>`;
+  }else if(p.tipo==="escala"){
+    const c=p.config||{};
+    cuerpo=`<div class="fila"><label class="campo">Empieza en<select class="txt" data-cfg="min">${[0,1].map(n=>`<option ${+(c.min??1)===n?"selected":""}>${n}</option>`).join("")}</select></label>
+      <label class="campo">Termina en<select class="txt" data-cfg="max">${[3,4,5,6,7,8,9,10].map(n=>`<option ${+(c.max??10)===n?"selected":""}>${n}</option>`).join("")}</select></label></div>
+      <div class="fila"><div class="campo grow">${etiqueta("Texto del número más bajo","cfg-min-"+p.id)}<input class="txt" id="cfg-min-${p.id}" data-cfg="etiqueta_min" value="${esc(c.etiqueta_min||"")}" placeholder="Por ejemplo: Nada probable"></div>
+      <div class="campo grow">${etiqueta("Texto del número más alto","cfg-max-"+p.id)}<input class="txt" id="cfg-max-${p.id}" data-cfg="etiqueta_max" value="${esc(c.etiqueta_max||"")}" placeholder="Por ejemplo: Muy probable"></div></div>
+      <label class="switch"><input type="checkbox" data-nps ${c.nps?"checked":""}> Usar esta pregunta para calcular el NPS (índice de recomendación)</label>`;
+  }else{
+    cuerpo=`<p class="nota">La persona escribe su respuesta con sus propias palabras.</p>`;
+  }
+  return `<div class="tarjeta preg abierta" data-id="${p.id}"><div class="editor">
+    ${etiqueta("Pregunta","tq-"+p.id)}
+    <textarea class="txt titq" id="tq-${p.id}" data-titulo rows="2">${esc(p.titulo)}</textarea>
+    <div class="campo">${etiqueta("Tipo de respuesta","tp-"+p.id)}<select class="txt" id="tp-${p.id}" data-tipo>${Object.entries(TIPOS).map(([k,[t]])=>`<option value="${k}" ${p.tipo===k?"selected":""}>${t}</option>`).join("")}</select></div>
+    ${cuerpo}
+    <div class="fila"><div class="campo grow">${etiqueta("Sección","sc-"+p.id,"agrupa preguntas")}<input class="txt" id="sc-${p.id}" data-seccion list="dl-secs" value="${esc(p.seccion||"")}" placeholder="Sin sección"></div>
+      <div class="campo grow">${etiqueta("Aclaración debajo de la pregunta","ay-"+p.id,"opcional")}<input class="txt" id="ay-${p.id}" data-ayuda value="${esc(p.ayuda||"")}" placeholder="Por ejemplo: piensa en los últimos 12 meses"></div></div>
+    <datalist id="dl-secs">${secs.map(s=>`<option value="${esc(s)}">`).join("")}</datalist>
+    <div class="fila" style="gap:20px">
+      <label class="switch"><input type="checkbox" data-obl ${p.obligatoria?"checked":""}> Respuesta obligatoria</label>
+      ${usaSaltos?`<label class="switch"><input type="checkbox" data-bif ${conSaltos?"checked":""}> Llevar a otra pregunta según la respuesta</label>`:""}
+    </div>
+    ${S.borrar===p.id?`<div class="confirmar">¿Eliminar esta pregunta? <button class="btn peligro sm" data-borrar-si>Sí, eliminar</button><button class="btn sm" data-borrar-no>Cancelar</button></div>`:""}
+    <div class="pie-ed">
+      <button class="btn sm" data-mover="-1" ${i===0?"disabled":""}>${ICO.arriba} Subir</button>
+      <button class="btn sm" data-mover="1" ${i===S.P.length-1?"disabled":""}>${ICO.abajo} Bajar</button>
+      <button class="btn sm" data-duplicar>${ICO.copiar} Duplicar</button>
+      <button class="btn sm peligro" data-borrar>${ICO.borrar} Eliminar</button>
+      <span class="sep"></span>
+      <button class="btn sm" data-agregar="${i}">+ Pregunta debajo</button>
+      <button class="cta" data-listo>Listo</button>
+    </div></div></div>`;
+}
+function enlazarEditor(el){
+  const p=S.P.find(x=>x.id===el.dataset.id);const i=S.P.indexOf(p);
+  const g=c=>{Object.assign(p,c);guardarCampo("preguntas",p.id,c)};
+  el.querySelector("[data-titulo]").oninput=e=>g({titulo:e.target.value});
+  el.querySelector("[data-seccion]").oninput=e=>g({seccion:e.target.value.trim()||null});
+  el.querySelector("[data-seccion]").onchange=()=>pintarPreguntas();
+  el.querySelector("[data-ayuda]").oninput=e=>g({ayuda:e.target.value||null});
+  el.querySelector("[data-obl]").onchange=e=>g({obligatoria:e.target.checked});
+  el.querySelector("[data-tipo]").onchange=e=>{
+    const t=e.target.value;const c={tipo:t};
+    if(t==="likert") c.opciones=LIKERT;
+    else if(t==="emociones") c.opciones=EMOCIONES;
+    else if((t==="opcion"||t==="multiple")&&(!p.opciones||!p.opciones.length||p.tipo==="likert"||p.tipo==="emociones")) c.opciones=["Opción 1","Opción 2"];
+    else if(t==="escala"||t==="abierta") c.opciones=[];
+    c.config=t==="escala"?{min:1,max:10,etiqueta_min:"Nada probable",etiqueta_max:"Muy probable"}:{};
+    g(c);pintarPreguntas();
+  };
+  const ops=()=>Array.isArray(p.opciones)?[...p.opciones]:[];
+  el.querySelectorAll("[data-op]").forEach(inp=>inp.oninput=e=>{
+    const k=+inp.dataset.op;const a=ops();const viejo=a[k];a[k]=e.target.value;
+    const cfg={...p.config};if(cfg.saltos&&cfg.saltos[viejo]){cfg.saltos={...cfg.saltos};cfg.saltos[a[k]]=cfg.saltos[viejo];delete cfg.saltos[viejo]}
+    g({opciones:a,config:cfg});
+  });
+  el.querySelectorAll("[data-op-borrar]").forEach(b=>b.onclick=()=>{const k=+b.dataset.opBorrar;const a=ops();const [q]=a.splice(k,1);const cfg={...p.config};if(cfg.saltos){cfg.saltos={...cfg.saltos};delete cfg.saltos[q]}g({opciones:a,config:cfg});pintarPreguntas()});
+  el.querySelectorAll("[data-op-arriba]").forEach(b=>b.onclick=()=>{const k=+b.dataset.opArriba;const a=ops();[a[k-1],a[k]]=[a[k],a[k-1]];g({opciones:a});pintarPreguntas()});
+  const ag=el.querySelector("[data-op-agregar]");if(ag)ag.onclick=()=>{const a=ops();a.push("Opción "+(a.length+1));g({opciones:a});pintarPreguntas();const u=document.getElementById(`op-${p.id}-${a.length-1}`);if(u){u.focus();u.select()}};
+  const lk=el.querySelector("[data-likert]");if(lk)lk.onclick=()=>{g({opciones:LIKERT});pintarPreguntas()};
+  el.querySelectorAll("[data-salto]").forEach(s=>s.onchange=()=>{const k=+s.dataset.salto;const o=ops()[k];const cfg={...p.config,saltos:{...(p.config.saltos||{})}};if(s.value)cfg.saltos[o]=s.value;else delete cfg.saltos[o];g({config:cfg})});
+  const bif=el.querySelector("[data-bif]");if(bif)bif.onchange=e=>{const cfg={...p.config,bifurcacion:e.target.checked};if(!e.target.checked)delete cfg.saltos;g({config:cfg});pintarPreguntas()};
+  el.querySelectorAll("[data-cfg]").forEach(inp=>inp.oninput=inp.onchange=()=>{const v=inp.tagName==="SELECT"?+inp.value:inp.value;g({config:{...p.config,[inp.dataset.cfg]:v}})});
+  const nps=el.querySelector("[data-nps]");if(nps)nps.onchange=e=>g({config:{...p.config,nps:e.target.checked}});
+  el.querySelectorAll("[data-mover]").forEach(b=>b.onclick=async()=>{const j=i+(+b.dataset.mover);if(j<0||j>=S.P.length)return;[S.P[i],S.P[j]]=[S.P[j],S.P[i]];pintarPreguntas();await renumerar()});
+  el.querySelector("[data-duplicar]").onclick=()=>insertarPregunta(i,{...p,titulo:p.titulo+" (copia)",config:{...p.config,saltos:undefined}});
+  el.querySelector("[data-borrar]").onclick=()=>{S.borrar=p.id;pintarPreguntas()};
+  const si=el.querySelector("[data-borrar-si]");if(si)si.onclick=()=>borrarPregunta(p);
+  const no=el.querySelector("[data-borrar-no]");if(no)no.onclick=()=>{S.borrar=null;pintarPreguntas()};
+  el.querySelector("[data-listo]").onclick=()=>{S.abierta=null;S.borrar=null;pintarPreguntas()};
+}
+function plantilla(tipo){
+  const base={titulo:"Escribe aquí tu pregunta",tipo,obligatoria:true,ayuda:null,opciones:[],config:{}};
+  if(tipo==="opcion"||tipo==="multiple") base.opciones=["Opción 1","Opción 2"];
+  if(tipo==="likert") base.opciones=LIKERT;
+  if(tipo==="emociones") base.opciones=EMOCIONES;
+  if(tipo==="escala") base.config={min:1,max:10,etiqueta_min:"Nada probable",etiqueta_max:"Muy probable"};
+  if(tipo==="abierta") base.obligatoria=false;
+  return base;
+}
+function agregarPregunta(pos,tipo){const ref=S.P[pos];insertarPregunta(pos,{...plantilla(tipo),seccion:ref?ref.seccion:null})}
+async function insertarPregunta(pos,datos){
+  guardando("Guardando…");
+  const fila={encuesta_id:S.E.id,orden:pos+2,seccion:datos.seccion??null,descripcion_seccion:datos.descripcion_seccion??null,tipo:datos.tipo,titulo:datos.titulo,ayuda:datos.ayuda??null,opciones:datos.opciones||[],obligatoria:!!datos.obligatoria,config:JSON.parse(JSON.stringify(datos.config||{}))};
+  const {data,error}=await sb.from("preguntas").insert(fila).select().single();
+  if(error) return fallo(error);
+  S.P.splice(pos+1,0,data);S.abierta=data.id;S.menuTipos=null;S.secEd=null;pintarPreguntas();
+  await renumerar();
+  const a=document.querySelector(".preg.abierta [data-titulo]");if(a){a.focus();a.select();a.scrollIntoView({block:"center",behavior:"smooth"})}
+}
+async function borrarPregunta(p){
+  guardando("Guardando…");
+  const {error}=await sb.from("preguntas").delete().eq("id",p.id);
+  if(error) return fallo(error);
+  S.P=S.P.filter(x=>x.id!==p.id);
+  for(const q of S.P){const s=q.config&&q.config.saltos;if(s&&Object.values(s).includes(p.id)){const ns={...s};for(const k in ns)if(ns[k]===p.id)delete ns[k];q.config={...q.config,saltos:ns};await sb.from("preguntas").update({config:q.config}).eq("id",q.id)}}
+  S.abierta=null;S.borrar=null;pintarPreguntas();await renumerar();toast("Pregunta eliminada.");
+}
+
+/* ===================== MENSAJES Y ÁREAS ===================== */
+function pintarMensajes(){
+  const E=S.E,c=cfgE();const cu=$("#cuerpo");
+  const campo=(id,titulo,ayuda,valor,ph,area=false)=>`<div class="campo">${etiqueta(titulo,id,ayuda)}${area?`<textarea class="txt" id="${id}" placeholder="${esc(ph)}">${esc(valor)}</textarea>`:`<input class="txt" id="${id}" value="${esc(valor)}" placeholder="${esc(ph)}">`}</div>`;
+  cu.innerHTML=`
+  <div class="tarjeta bloque portadilla"><h2>Mensajes que ve el personal</h2><p class="nota">Son los textos que aparecen antes y después de las preguntas. Cámbialos cuando quieras.</p>
+    ${campo("m-tit","Título de la encuesta","al empezar",E.titulo,"Encuesta de clima")}
+    ${campo("m-desc","Mensaje de bienvenida","al empezar",E.descripcion||"","Explica para qué es la encuesta",true)}
+    ${campo("m-boton","Texto del botón para empezar","",c.boton_inicio||"Comenzar","Comenzar")}
+    ${campo("m-area","Pregunta para elegir el área","solo aparece si la persona entra por el enlace general",c.pregunta_area||"¿En qué área trabajas?","¿En qué área trabajas?")}
+    ${campo("m-gracias","Mensaje de agradecimiento","al terminar",c.mensaje_gracias||"Tu respuesta quedó registrada. Tu opinión ayuda a construir un mejor lugar para trabajar.","Gracias por responder",true)}
+    ${campo("m-ya","Mensaje si alguien intenta responder dos veces","",c.mensaje_ya_respondio||"En este dispositivo ya se envió una respuesta. ¡Gracias por participar!","Ya respondiste esta encuesta",true)}
+  </div>
+  <div class="tarjeta bloque"><h2>Áreas</h2><p class="nota">Cada área tiene su propio enlace y código QR en <b>Compartir</b>. Quien entra por el QR de su área no tiene que elegirla.</p>
+    <div id="lista-areas">${S.U.map((u,k)=>`<div class="area-fila" data-u="${u.id}">
+      <input class="txt" id="ar-${u.id}" value="${esc(u.nombre)}" aria-label="Nombre del área">${editar("ar-"+u.id)}
+      <button class="ico" data-ar-mover="-1" ${k===0?"disabled":""} aria-label="Subir área" title="Subir">${ICO.arriba}</button>
+      <button class="ico" data-ar-mover="1" ${k===S.U.length-1?"disabled":""} aria-label="Bajar área" title="Bajar">${ICO.abajo}</button>
+      <button class="btn sm peligro" data-ar-borrar>${ICO.borrar} Eliminar</button>
+      ${S.borrar==="ar:"+u.id?`<div class="confirmar" style="flex-basis:100%">¿Eliminar el área "${esc(u.nombre)}"? Su QR dejará de funcionar. Las respuestas que ya llegaron se conservan. <button class="btn peligro sm" data-ar-si>Sí, eliminar</button><button class="btn sm" data-ar-no>Cancelar</button></div>`:""}
+    </div>`).join("")||'<p class="nota">No hay áreas. Agrega la primera.</p>'}</div>
+    <div class="fila"><input class="txt grow" id="nueva-area" placeholder="Nombre de la nueva área"><button class="btn" data-agregar-area>+ Agregar área</button></div>
+  </div>
+  <div class="tarjeta bloque"><h2>Mi cuenta</h2><p class="nota">Entraste como <b>${esc(S.user&&S.user.email)}</b>. Puedes cambiar tu contraseña aquí.</p>
+    <div class="fila"><label class="campo grow">Nueva contraseña<input class="txt" type="password" id="clave1" autocomplete="new-password"></label><label class="campo grow">Repite la nueva contraseña<input class="txt" type="password" id="clave2" autocomplete="new-password"></label></div>
+    <div><button class="btn" data-clave>Cambiar contraseña</button></div>
+  </div>
+  <div class="tarjeta bloque"><h2>Eliminar esta encuesta</h2><p class="nota">Borra la encuesta completa con sus preguntas, áreas y respuestas. No se puede deshacer. Antes, descarga el Excel de respuestas.</p>
+    ${S.borrar==="__encuesta"?`<div class="confirmar">¿Eliminar "${esc(E.titulo)}" y sus ${S.R.length} respuestas? <button class="btn peligro sm" data-enc-si>Sí, eliminar todo</button><button class="btn sm" data-enc-no>Cancelar</button></div>`:`<div><button class="btn peligro" data-enc-borrar>${ICO.borrar} Eliminar encuesta</button></div>`}
+  </div>`;
+  const vincular=(id,fn)=>{const el=$("#"+id);if(el)el.oninput=()=>fn(el.value)};
+  vincular("m-tit",v=>{E.titulo=v;guardarCampo("encuestas",E.id,{titulo:v});const o=$("#sel-enc option[value='"+E.id+"']");if(o)o.textContent=v});
+  vincular("m-desc",v=>{E.descripcion=v;guardarCampo("encuestas",E.id,{descripcion:v})});
+  vincular("m-boton",v=>{c.boton_inicio=v;guardarConfig()});
+  vincular("m-area",v=>{c.pregunta_area=v;guardarConfig()});
+  vincular("m-gracias",v=>{c.mensaje_gracias=v;guardarConfig()});
+  vincular("m-ya",v=>{c.mensaje_ya_respondio=v;guardarConfig()});
+  cu.querySelectorAll(".area-fila").forEach(fila=>{
+    const u=S.U.find(x=>x.id===fila.dataset.u);const k=S.U.indexOf(u);
+    fila.querySelector("input").oninput=e=>{u.nombre=e.target.value;guardarCampo("unidades",u.id,{nombre:u.nombre})};
+    fila.querySelectorAll("[data-ar-mover]").forEach(b=>b.onclick=async()=>{const j=k+(+b.dataset.arMover);if(j<0||j>=S.U.length)return;[S.U[k],S.U[j]]=[S.U[j],S.U[k]];pintarMensajes();
+      guardando("Guardando…");const res=await Promise.all(S.U.map((x,n)=>{x.orden=n+1;return sb.from("unidades").update({orden:n+1}).eq("id",x.id)}));const e=res.find(r=>r.error);if(e)return fallo(e.error);guardando("Todos los cambios se guardaron")});
+    fila.querySelector("[data-ar-borrar]").onclick=()=>{S.borrar="ar:"+u.id;pintarMensajes()};
+    const si=fila.querySelector("[data-ar-si]");if(si)si.onclick=async()=>{const {error}=await sb.from("unidades").delete().eq("id",u.id);if(error)return fallo(error);S.U=S.U.filter(x=>x.id!==u.id);S.borrar=null;pintarMensajes();toast("Área eliminada.")};
+    const no=fila.querySelector("[data-ar-no]");if(no)no.onclick=()=>{S.borrar=null;pintarMensajes()};
+  });
+  cu.querySelector("[data-agregar-area]").onclick=agregarArea;
+  $("#nueva-area").onkeydown=e=>{if(e.key==="Enter")agregarArea()};
+  cu.querySelector("[data-clave]").onclick=async()=>{
+    const a=$("#clave1").value,b=$("#clave2").value;
+    if(a.length<8)return toast("La contraseña debe tener al menos 8 caracteres.");
+    if(a!==b)return toast("Las dos contraseñas no coinciden.");
+    const {error}=await sb.auth.updateUser({password:a});
+    if(error)return fallo(error,"No se pudo cambiar la contraseña");
+    $("#clave1").value=$("#clave2").value="";toast("Contraseña cambiada.");
+  };
+  const eb=cu.querySelector("[data-enc-borrar]");if(eb)eb.onclick=()=>{S.borrar="__encuesta";pintarMensajes()};
+  const es=cu.querySelector("[data-enc-si]");if(es)es.onclick=async()=>{const {error}=await sb.from("encuestas").delete().eq("id",E.id);if(error)return fallo(error,"No se pudo eliminar");S.E=null;S.borrar=null;S.tab="preguntas";await cargarEncuestas();toast("Encuesta eliminada.")};
+  const en=cu.querySelector("[data-enc-no]");if(en)en.onclick=()=>{S.borrar=null;pintarMensajes()};
+}
+async function agregarArea(){
+  const inp=$("#nueva-area");const nombre=inp.value.trim();if(!nombre){inp.focus();return toast("Escribe el nombre del área.")}
+  let slug=slugify(nombre);let n=2;while(S.U.some(u=>u.slug===slug))slug=slugify(nombre)+"-"+n++;
+  const {data,error}=await sb.from("unidades").insert({encuesta_id:S.E.id,slug,nombre,orden:S.U.length+1}).select().single();
+  if(error)return fallo(error);S.U.push(data);
+  if(S.tab==="mensajes")pintarMensajes();else pintarCompartir();
+  toast("Área agregada.");
+}
+
+/* ===================== RESPUESTAS ===================== */
+function respuestasFiltradas(){return S.filtro?S.R.filter(r=>(r.unidad||"Sin área")===S.filtro):S.R}
+function pintarRespuestas(){
+  const R=respuestasFiltradas();const c=$("#cuerpo");
+  const areas=[...new Set(S.R.map(r=>r.unidad||"Sin área"))].sort();
+  const ultima=S.R[0]?new Date(S.R[0].enviada_en).toLocaleString("es-CR",{dateStyle:"medium",timeStyle:"short"}):"—";
+  let html=`<div class="kpis"><div class="kpi"><strong>${R.length}</strong><span>respuestas${S.filtro?" en "+esc(S.filtro):""}</span></div>
+    <div class="kpi"><strong>${areas.length}</strong><span>áreas con respuestas</span></div>
+    <div class="kpi"><strong style="font-size:18px;padding-block:8px">${ultima}</strong><span>última respuesta</span></div></div>
+    <div class="barra-acc"><label class="campo" style="flex:1 1 220px">Ver resultados de<select class="txt" id="filtro"><option value="">Toda la empresa (global)</option>${areas.map(a=>`<option ${S.filtro===a?"selected":""}>${esc(a)}</option>`).join("")}</select></label>
+    <button class="cta" data-excel>Descargar Excel</button>
+    <button class="btn" data-recargar>Actualizar</button></div>`;
+  if(!R.length){html+=`<div class="tarjeta vacio">Todavía no hay respuestas${S.E.estado!=="abierta"?". Cambia el estado a Abierta para empezar a recibirlas.":"."}</div>`}
+  else{
+    if(!S.filtro){
+      const conteo={};S.R.forEach(r=>{const a=r.unidad||"Sin área";conteo[a]=(conteo[a]||0)+1});
+      html+=`<div class="tarjeta res"><h3>Participación por área</h3><div class="tabla"><table><thead><tr><th>Área</th><th style="text-align:right">Respuestas</th></tr></thead><tbody>${Object.entries(conteo).sort((a,b)=>b[1]-a[1]).map(([a,n])=>`<tr><td>${esc(a)}</td><td class="n">${n}</td></tr>`).join("")}</tbody></table></div></div>`;
+    }
+    S.P.forEach((p,i)=>html+=resumenPregunta(p,i,R));
+    html+=`<div class="tarjeta res"><h3>Respuestas una por una</h3><p class="meta">Puedes revisar o eliminar respuestas individuales, por ejemplo las de prueba.</p>${R.map((r,k)=>unaHTML(r,R.length-k)).join("")}</div>`;
+    html+=`<div class="tarjeta res"><h3>Borrar todas las respuestas</h3><p class="meta">Útil después de las pruebas, antes de abrir la encuesta al personal.</p>
+      ${S.borrar==="__resp"?`<div class="confirmar">¿Borrar las ${S.R.length} respuestas? No se puede deshacer. <button class="btn peligro sm" data-limpiar-si>Sí, borrar todo</button><button class="btn sm" data-limpiar-no>Cancelar</button></div>`:`<button class="btn peligro" data-limpiar>${ICO.borrar} Borrar todas las respuestas</button>`}</div>`;
+  }
+  c.innerHTML=html;
+  $("#filtro").onchange=e=>{S.filtro=e.target.value;pintarRespuestas()};
+  c.querySelector("[data-excel]").onclick=descargarExcel;
+  c.querySelector("[data-recargar]").onclick=async()=>{await abrirEncuesta(S.E.id);S.tab="respuestas";pintar();toast("Respuestas actualizadas.")};
+  const l=c.querySelector("[data-limpiar]");if(l)l.onclick=()=>{S.borrar="__resp";pintarRespuestas()};
+  const ln=c.querySelector("[data-limpiar-no]");if(ln)ln.onclick=()=>{S.borrar=null;pintarRespuestas()};
+  const ls=c.querySelector("[data-limpiar-si]");if(ls)ls.onclick=async()=>{const {error}=await sb.from("respuestas").delete().eq("encuesta_id",S.E.id);if(error)return fallo(error,"No se pudieron borrar");S.borrar=null;S.R=[];pintar();toast("Respuestas borradas.")};
+  c.querySelectorAll(".una").forEach(el=>{
+    const r=S.R.find(x=>x.id===el.dataset.r);
+    el.querySelector("[data-ver]").onclick=()=>{S.verResp=S.verResp===r.id?null:r.id;pintarRespuestas()};
+    el.querySelector("[data-una-borrar]").onclick=()=>{S.borrar="r:"+r.id;pintarRespuestas()};
+    const si=el.querySelector("[data-una-si]");if(si)si.onclick=async()=>{const {error}=await sb.from("respuestas").delete().eq("id",r.id);if(error)return fallo(error,"No se pudo eliminar");S.R=S.R.filter(x=>x.id!==r.id);S.borrar=null;pintar();toast("Respuesta eliminada.")};
+    const no=el.querySelector("[data-una-no]");if(no)no.onclick=()=>{S.borrar=null;pintarRespuestas()};
+  });
+}
+function unaHTML(r,n){
+  const f=new Date(r.enviada_en).toLocaleString("es-CR",{dateStyle:"medium",timeStyle:"short"});
+  const abierta=S.verResp===r.id;
+  return `<div class="una" data-r="${r.id}"><div class="una-cab"><span>#${n} · ${f} · ${esc(r.unidad||"Sin área")}</span>
+    <button class="btn sm" data-ver>${abierta?"Ocultar":"Ver"}</button><button class="btn sm peligro" data-una-borrar>${ICO.borrar} Eliminar</button></div>
+    ${S.borrar==="r:"+r.id?`<div class="confirmar" style="margin-top:8px">¿Eliminar esta respuesta? <button class="btn peligro sm" data-una-si>Sí, eliminar</button><button class="btn sm" data-una-no>Cancelar</button></div>`:""}
+    ${abierta?`<dl>${S.P.filter(p=>r.datos[p.id]!==undefined).map(p=>{const v=r.datos[p.id];return `<dt>${S.P.indexOf(p)+1}. ${esc(p.titulo)}</dt><dd>${esc(Array.isArray(v)?v.join(", "):v)}</dd>`}).join("")||"<dd>Sin datos</dd>"}</dl>`:""}</div>`;
+}
+function barra(et,n,tot){const pct=tot?n/tot*100:0;return `<div class="bar"><span class="et">${esc(et)}</span><span class="tr"><i style="width:${pct.toFixed(1)}%"></i></span><span class="vl">${n} · ${pct.toFixed(pct%1?1:0)}%</span></div>`}
+function resumenPregunta(p,i,R){
+  const vals=R.map(r=>r.datos[p.id]).filter(v=>v!==undefined&&v!==null&&v!=="");
+  const n=vals.length;let cuerpo="";
+  if(p.tipo==="abierta"){
+    cuerpo=n?`<div class="textos">${vals.map(v=>`<p>${esc(v)}</p>`).join("")}</div>`:"";
+  }else if(p.tipo==="escala"){
+    const c=p.config||{};const min=+(c.min??1),max=+(c.max??10);const cnt={};vals.forEach(v=>cnt[v]=(cnt[v]||0)+1);
+    const prom=n?vals.reduce((a,b)=>a+(+b),0)/n:0;
+    if(c.nps&&n){const pro=vals.filter(v=>v>=9).length,det=vals.filter(v=>v<=6).length,pas=n-pro-det;const nps=Math.round((pro-det)/n*100);
+      cuerpo+=`<div class="nps-box"><div><b>${nps}</b>NPS</div><div><b>${pro}</b>Promotores (9–10)</div><div><b>${pas}</b>Pasivos (7–8)</div><div><b>${det}</b>Detractores (${min}–6)</div></div>`}
+    if(n) cuerpo+=`<p class="meta">Promedio: <b>${prom.toFixed(1)}</b></p>`;
+    for(let k=max;k>=min;k--) cuerpo+=barra(String(k),cnt[k]||0,n);
+  }else{
+    const ops=Array.isArray(p.opciones)?p.opciones:[];const cnt={};
+    vals.forEach(v=>(Array.isArray(v)?v:[v]).forEach(x=>cnt[x]=(cnt[x]||0)+1));
+    const extra=Object.keys(cnt).filter(k=>!ops.includes(k));
+    if(p.tipo==="likert"&&n){const fav=(cnt["Totalmente de acuerdo"]||0)+(cnt["De acuerdo"]||0);cuerpo+=`<div class="nps-box"><div><b>${Math.round(fav/n*100)}%</b>Favorable (de acuerdo + totalmente)</div></div>`}
+    [...ops,...extra].forEach(o=>cuerpo+=barra(o,cnt[o]||0,n));
+  }
+  return `<div class="tarjeta res"><h3>${i+1}. ${esc(p.titulo)}</h3><p class="meta">${n} respuesta${n===1?"":"s"}${p.seccion?" · "+esc(p.seccion):""}</p>${n?cuerpo:'<p class="nota">Sin respuestas todavía.</p>'}</div>`;
+}
+function descargarExcel(){
+  const R=respuestasFiltradas();
+  const filas=R.slice().reverse().map((r,k)=>{
+    const f={"N.º":k+1,"Fecha":new Date(r.enviada_en).toLocaleString("es-CR"),"Área":r.unidad||""};
+    S.P.forEach((p,i)=>{const v=r.datos[p.id];f[`P${i+1}. ${p.titulo}`.slice(0,250)]=Array.isArray(v)?v.join("; "):(v??"")});
+    return f;
+  });
+  const preg=S.P.map((p,i)=>({"N.º":i+1,"Sección":p.seccion||"","Pregunta":p.titulo,"Tipo":(TIPOS[p.tipo]||[p.tipo])[0],"Opciones":(p.opciones||[]).join(" | "),"Escala":p.tipo==="escala"?`${p.config.min??1}-${p.config.max??10}${p.config.nps?" (NPS)":""}`:"","Obligatoria":p.obligatoria?"Sí":"No","ID":p.id}));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(filas.length?filas:[{"Sin respuestas":""}]),"Respuestas");
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(preg),"Preguntas");
+  XLSX.writeFile(wb,`${S.E.titulo}${S.filtro?" - "+S.filtro:""}.xlsx`.replace(/[\\/:*?"<>|]/g,"-"));
+}
+
+/* ===================== COMPARTIR ===================== */
+function compartir(){
+  const f=document.createElement("div");f.className="modal-fondo";f.id="m-compartir";
+  document.body.appendChild(f);pintarCompartir();
+  f.onclick=e=>{if(e.target===f)f.remove()};
+}
+function pintarCompartir(){
+  const f=$("#m-compartir");if(!f)return;const base=baseURL();
+  f.innerHTML=`<div class="modal" role="dialog" aria-label="Compartir"><div class="modal-cab"><h2>Compartir</h2><button class="ico" data-cerrar aria-label="Cerrar">${ICO.x}</button></div>
+    ${S.E.estado!=="abierta"?`<p class="confirmar" style="color:var(--petroleo);background:var(--verde-suave)">La encuesta está en ${S.E.estado}. Los enlaces funcionarán cuando cambies el estado a Abierta.</p>`:""}
+    <div><div class="eyebrow">Enlace general</div><p class="nota">Al entrar, la persona elige su área.</p>
+    <div class="link-gen"><input class="txt" readonly value="${base}"><button class="btn" data-copiar="${base}">${ICO.copiar} Copiar enlace</button></div></div>
+    <div><div class="eyebrow">Enlace y QR de cada área</div><p class="nota">Registran el área sola. Para cambiar nombres o agregar áreas usa la pestaña <b>Mensajes y áreas</b>.</p></div>
+    <div class="areas">${S.U.map(u=>`<div class="area" data-u="${u.id}"><div class="qr" id="qr-${u.id}"></div><b>${esc(u.nombre)}</b>
+      <div class="acc"><button class="btn sm" data-copiar="${base}?u=${u.slug}">${ICO.copiar} Copiar enlace</button><button class="btn sm" data-png>Descargar QR</button></div></div>`).join("")||'<p class="nota">No hay áreas todavía.</p>'}</div></div>`;
+  f.querySelector("[data-cerrar]").onclick=()=>f.remove();
+  f.querySelectorAll("[data-copiar]").forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copiar);toast("Enlace copiado.")}catch{toast("Selecciona el enlace y cópialo manualmente.")}});
+  S.U.forEach(u=>{const el=$("#qr-"+u.id);if(el&&window.QRCode)new QRCode(el,{text:`${base}?u=${u.slug}`,width:300,height:300,colorDark:"#003C40",colorLight:"#FFFFFF",correctLevel:QRCode.CorrectLevel.M})});
+  f.querySelectorAll(".area[data-u]").forEach(card=>{const u=S.U.find(x=>x.id===card.dataset.u);card.querySelector("[data-png]").onclick=()=>descargarQR(card,u)});
+}
+function descargarQR(card,u){
+  const src=card.querySelector(".qr canvas")||card.querySelector(".qr img");if(!src)return;
+  const W=600,H=720;const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  x.fillStyle="#FFFFFF";x.fillRect(0,0,W,H);
+  x.fillStyle="#B2D234";x.fillRect(W*0.62,H-14,W*0.38,14);
+  const dibujar=img=>{x.drawImage(img,75,60,450,450);x.fillStyle="#003C40";x.textAlign="center";x.font="500 34px Jost, sans-serif";x.fillText(u.nombre,W/2,575);x.fillStyle="#58585B";x.font="24px Jost, sans-serif";x.fillText(S.E.titulo,W/2,620);
+    const a=document.createElement("a");a.download=`QR ${u.nombre}.png`;a.href=c.toDataURL("image/png");a.click()};
+  if(src.tagName==="CANVAS")dibujar(src);else{const im=new Image();im.onload=()=>dibujar(im);im.src=src.src}
+}
+
+iniciar();
+</script>
+</body>
+</html>

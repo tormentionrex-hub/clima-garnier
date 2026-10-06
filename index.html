@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Clima Garnier 2026</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="marca.css">
+<style>
+.app{min-height:100%;display:flex;flex-direction:column;max-width:580px;margin:0 auto;padding-inline:16px;padding-block:env(safe-area-inset-top,0px) calc(28px + env(safe-area-inset-bottom,0px));position:relative}
+body{font-size:17px}
+.top{display:flex;align-items:center;gap:12px;padding-block:16px 10px}
+.top img{width:30px;height:auto}
+.track{flex:1;height:6px;border-radius:3px;background:var(--gris-claro);overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--verde);transition:width .6s var(--ease)}
+.count{font-size:13px;font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+.top.oculto{visibility:hidden}
+.stage{flex:1;display:grid}
+.screen{grid-area:1/1;display:flex;flex-direction:column;gap:22px;padding-block:18px 8px;min-width:0}
+.screen.entra{animation:entra .5s var(--ease) both}
+.screen.sale{animation:sale .3s var(--ease) both;pointer-events:none}
+.screen.atras.entra{animation-name:entraAtras}
+@keyframes entra{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+@keyframes entraAtras{from{opacity:0;transform:translateX(-36px)}to{opacity:1;transform:none}}
+@keyframes sale{to{opacity:0;transform:translateX(-30px)}}
+h1{font-size:clamp(30px,8vw,40px);line-height:1.12}
+h2{font-size:clamp(21px,5.4vw,26px);line-height:1.28}
+.ayuda{font-size:15px;margin:0}
+.portada{justify-content:center;gap:24px}
+.portada .logo{width:150px}
+.diagonal{display:none;position:fixed;left:-50px;top:110px;width:260px;height:1.5px;background:var(--verde);transform:rotate(-27deg);pointer-events:none;z-index:-1}
+.chip{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:var(--verde-suave);color:var(--petroleo);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:500}
+.chip b{width:8px;height:8px;border-radius:50%;background:var(--verde)}
+.datos{display:flex;gap:22px;flex-wrap:wrap;font-size:14px}
+.datos div{display:flex;flex-direction:column}
+.datos strong{font-size:22px;font-weight:500;color:var(--petroleo);font-variant-numeric:tabular-nums}
+.cta svg{transition:transform .25s var(--ease)}
+.cta:hover svg{transform:translateX(4px)}
+.portada .cta{align-self:flex-start}
+.opciones{display:flex;flex-direction:column;gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.op{appearance:none;width:100%;text-align:left;border:1.5px solid var(--gris-claro);background:var(--blanco);border-radius:16px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;font-size:17px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s var(--ease),background .2s}
+.op:hover{border-color:var(--verde)}
+.op:active{transform:scale(.98)}
+.op .dot{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid #C9CBC4;display:grid;place-items:center;transition:all .25s var(--ease)}
+.op.multi .dot{border-radius:6px}
+.op .dot svg{opacity:0;transform:scale(.4);transition:all .3s var(--ease)}
+.op.sel{border-color:var(--verde);background:var(--verde-suave);color:var(--petroleo);font-weight:500}
+.op.sel .dot{background:var(--verde);border-color:var(--verde)}
+.op.sel .dot svg{opacity:1;transform:none}
+.op.centro{border-style:dashed}
+.ripple{position:absolute;border-radius:50%;background:var(--verde);opacity:.35;transform:scale(0);animation:ripple .6s ease-out forwards;pointer-events:none}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+.escala{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.n{appearance:none;aspect-ratio:1;border:1.5px solid var(--gris-claro);background:var(--blanco);border-radius:14px;font-size:22px;font-weight:500;color:var(--petroleo);cursor:pointer;font-variant-numeric:tabular-nums;transition:transform .2s var(--ease),background .2s,border-color .2s}
+.n:hover{border-color:var(--verde)}
+.n.rango{background:var(--verde-suave);border-color:var(--verde-suave)}
+.n.sel{background:var(--verde);border-color:var(--verde);transform:translateY(-4px) scale(1.06);box-shadow:0 8px 18px rgba(0,60,64,.15)}
+.extremos{display:flex;justify-content:space-between;gap:12px;font-size:13px}
+.emos{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.emo{appearance:none;border:1.5px solid var(--gris-claro);background:var(--blanco);border-radius:16px;padding:14px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:14px;text-align:center;transition:transform .2s var(--ease),border-color .2s,background .2s}
+.emo span{font-size:32px;line-height:1;transition:transform .35s var(--ease)}
+.emo:hover span{transform:scale(1.15) rotate(-6deg)}
+.emo.sel{border-color:var(--verde);background:var(--verde-suave);color:var(--petroleo);font-weight:500}
+.emo.sel span{animation:pop .5s var(--ease)}
+@keyframes pop{40%{transform:scale(1.4)}100%{transform:scale(1.1)}}
+textarea{width:100%;min-height:150px;resize:vertical;border:1.5px solid var(--gris-claro);border-radius:16px;padding:14px 16px;color:var(--petroleo);background:var(--blanco);transition:border-color .2s}
+textarea:focus{outline:none;border-color:var(--verde)}
+.contador{font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.medalla{width:84px;height:84px;border-radius:50%;background:var(--verde);display:grid;place-items:center;animation:medalla .7s var(--ease) both}
+@keyframes medalla{from{transform:scale(.3) rotate(-40deg);opacity:0}to{transform:none;opacity:1}}
+.seccion{justify-content:center}
+.seccion .cta{align-self:flex-start}
+.pie{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--petroleo);color:var(--blanco);padding:12px 18px;border-radius:12px;font-size:14px;max-width:calc(100% - 32px);opacity:0;transition:all .35s var(--ease);z-index:5;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.aviso-previa{position:sticky;top:0;z-index:3;background:var(--petroleo);color:var(--blanco);font-size:13px;text-align:center;padding:8px 12px;border-radius:0 0 10px 10px}
+.error{color:var(--rojo);font-size:14px}
+canvas#confeti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+.cargando{display:grid;place-items:center;min-height:60vh}
+.spinner{width:36px;height:36px;border-radius:50%;border:3px solid var(--gris-claro);border-top-color:var(--verde);animation:gira 1s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+body.en-portada .diagonal{display:block}
+</style>
+</head>
+<body>
+<div class="diagonal" aria-hidden="true"></div>
+<div class="app">
+  <div id="previa" hidden></div>
+  <div class="top oculto" id="top">
+    <img src="isotipo.png" alt="Garnier">
+    <div class="track"><i id="barra"></i></div>
+    <div class="count" id="count"></div>
+  </div>
+  <main class="stage" id="stage" aria-live="polite"><div class="cargando"><div class="spinner" role="status" aria-label="Cargando"></div></div></main>
+</div>
+<div class="barra-marca" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status"></div>
+<canvas id="confeti" hidden></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+"use strict";
+const sb = supabase.createClient(CLIMA_CONFIG.url, CLIMA_CONFIG.key);
+const CHECK='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6.3 4.8 9 10 3" stroke="#003C40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const FLECHA='<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const PALOMA='<svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M10 21 17 28 31 13" stroke="#003C40" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const EMOJI={feliz:"😊",comprometido:"🤝",comprometida:"🤝",motivado:"🚀",motivada:"🚀",satisfecho:"🙂",satisfecha:"🙂",indiferente:"😐",decepcionado:"😞",decepcionada:"😞",frustrado:"😣",frustrada:"😣",aburrido:"🥱",aburrida:"🥱",estresado:"😰",estresada:"😰",enfadado:"😠",enfadada:"😠",enojado:"😠",tranquilo:"😌",tranquila:"😌",orgulloso:"🏆",orgullosa:"🏆",cansado:"😩",cansada:"😩",ansioso:"😟",ansiosa:"😟",agradecido:"🙏",agradecida:"🙏"};
+const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const params=new URLSearchParams(location.search);
+const PREVIA=params.get("previa");               // id de encuesta (solo con sesión de administradora)
+const slugPedido=(params.get("u")||location.hash.slice(1)||"").toLowerCase();
+
+let E=null, P=[], U=[], unidad=null;
+const C=()=>(E&&E.config)||{};
+const r={};              // respuestas por id de pregunta
+let pasos=[];            // pantallas visitadas (pila para "Anterior")
+let pant=null;           // pantalla actual
+let enviando=false;
+
+/* ---------- carga ---------- */
+async function cargar(){
+  try{
+    let q=sb.from("encuestas").select("*");
+    q = PREVIA ? q.eq("id",PREVIA) : q.eq("estado","abierta").order("actualizada_en",{ascending:false}).limit(1);
+    const {data:enc,error}=await q;
+    if(error) throw error;
+    if(!enc||!enc.length){ return pantallaSimple("La encuesta no está disponible","En este momento no hay una encuesta abierta. Si recibiste este enlace, consulta con Recursos Humanos."); }
+    E=enc[0];
+    if(PREVIA){const a=document.getElementById("previa");a.hidden=false;a.className="aviso-previa";a.textContent="Vista previa · las respuestas no se guardan";}
+    const [{data:pr,error:e1},{data:un,error:e2}]=await Promise.all([
+      sb.from("preguntas").select("*").eq("encuesta_id",E.id).order("orden"),
+      sb.from("unidades").select("*").eq("encuesta_id",E.id).order("orden")
+    ]);
+    if(e1||e2) throw (e1||e2);
+    P=pr||[]; U=un||[];
+    unidad=U.find(u=>u.slug===slugPedido)||null;
+    document.title=E.titulo;
+    if(!PREVIA && yaRespondio()) return pantallaYaRespondio();
+    ir({tipo:"portada"});
+  }catch(err){
+    console.error(err);
+    pantallaSimple("No pudimos cargar la encuesta","Revisa tu conexión a internet y vuelve a intentarlo.",true);
+  }
+}
+function claveLocal(){return "clima-respondida-"+E.id}
+function yaRespondio(){try{return localStorage.getItem(claveLocal())==="1"}catch{return false}}
+function marcarRespondida(){try{localStorage.setItem(claveLocal(),"1")}catch{}}
+
+/* ---------- navegación ---------- */
+const secciones=()=>{const s=[];P.forEach(p=>{const k=p.seccion||"";if(!s.includes(k))s.push(k)});return s};
+function primeraPantalla(){
+  if(!unidad && U.length) return {tipo:"unidad"};
+  return preguntaDesde(0,null);
+}
+function preguntaDesde(i,prev){
+  if(i>=P.length) return {tipo:"fin"};
+  const p=P[i];
+  const secAnterior=prev?(prev.seccion||""):null;
+  if((p.seccion||"")!==secAnterior && p.seccion && !(pant&&pant.tipo==="seccion"&&pant.i===i)) return {tipo:"seccion",i};
+  return {tipo:"pregunta",i};
+}
+function siguientePantalla(){
+  if(pant.tipo==="portada") return primeraPantalla();
+  if(pant.tipo==="unidad") return preguntaDesde(0,null);
+  if(pant.tipo==="seccion") return {tipo:"pregunta",i:pant.i};
+  if(pant.tipo==="pregunta"){
+    const p=P[pant.i];
+    const saltos=(p.config&&p.config.saltos)||{};
+    const v=r[p.id];
+    if(typeof v==="string" && saltos[v]){
+      const j=P.findIndex(x=>x.id===saltos[v]);
+      if(j>pant.i){
+        for(let k=pant.i+1;k<j;k++) delete r[P[k].id];
+        aviso("Según tu respuesta, continúas en la pregunta "+(j+1)+".");
+        return preguntaDesde(j,p);
+      }
+    }
+    return preguntaDesde(pant.i+1,p);
+  }
+  return {tipo:"fin"};
+}
+function siguiente(){
+  if(pant.tipo==="pregunta"&&P[pant.i].tipo==="abierta"){const ta=document.querySelector(".screen:not(.sale) textarea");if(ta) r[P[pant.i].id]=ta.value.trim();}
+  const n=siguientePantalla();
+  if(n.tipo==="fin") return enviar();
+  pasos.push(pant); ir(n);
+}
+function anterior(){ if(pasos.length){ ir(pasos.pop(),true); } }
+
+function ir(s,atras=false){
+  pant=s;
+  document.body.classList.toggle("en-portada",s.tipo==="portada");
+  const stage=document.getElementById("stage");
+  stage.querySelectorAll(".cargando").forEach(x=>x.remove());
+  const actual=stage.querySelector(".screen:not(.sale)");
+  if(actual){actual.classList.remove("entra");actual.classList.add("sale");setTimeout(()=>actual.remove(),320)}
+  const el=document.createElement("section");
+  el.className="screen entra"+(atras?" atras":"")+(s.tipo==="portada"?" portada":"")+(s.tipo==="seccion"?" seccion":"");
+  el.innerHTML=render(s);stage.appendChild(el);enlazar(el,s);progreso();
+  window.scrollTo({top:0});
+  const f=el.querySelector("h1,h2");if(f){f.setAttribute("tabindex","-1");f.focus({preventScroll:true})}
+}
+function progreso(){
+  const top=document.getElementById("top");
+  top.classList.toggle("oculto",pant.tipo==="portada"||pant.tipo==="gracias");
+  const i=pant.tipo==="pregunta"||pant.tipo==="seccion"?pant.i:pant.tipo==="unidad"?0:P.length;
+  document.getElementById("barra").style.width=(P.length?Math.round(i/P.length*100):0)+"%";
+  document.getElementById("count").textContent=pant.tipo==="pregunta"?(pant.i+1)+" / "+P.length:"";
+}
+
+/* ---------- pantallas ---------- */
+function pieHTML(listo,texto="Siguiente"){
+  return `<div class="pie">${pasos.length?'<button class="link" data-atras>Anterior</button>':"<span></span>"}<button class="cta" data-sig ${listo?"":"disabled"}>${texto} ${FLECHA}</button></div>`;
+}
+function render(s){
+  if(s.tipo==="portada"){
+    const minutos=Math.max(3,Math.round(P.length*0.22));
+    return `<img class="logo" src="logo.png" alt="Garnier, Enhancing Land">
+      ${unidad?`<span class="chip"><b></b>${esc(unidad.nombre)}</span>`:""}
+      <h1>${esc(E.titulo)}</h1>
+      ${E.descripcion?`<p class="ayuda">${esc(E.descripcion)}</p>`:""}
+      <div class="datos"><div><strong>${P.length}</strong>preguntas</div><div><strong>≈ ${minutos}</strong>minutos</div><div><strong>${secciones().filter(Boolean).length||1}</strong>secciones</div></div>
+      <button class="cta" data-sig>${esc(C().boton_inicio||"Comenzar")} ${FLECHA}</button>`;
+  }
+  if(s.tipo==="unidad"){
+    return `<div class="eyebrow">Antes de empezar</div><h2>${esc(C().pregunta_area||"¿En qué área trabajas?")}</h2>
+      <div class="opciones grid2">${U.map(u=>op(u.nombre,unidad&&unidad.id===u.id,"",u.id)).join("")}</div>${pieHTML(!!unidad)}`;
+  }
+  if(s.tipo==="seccion"){
+    const lista=secciones().filter(Boolean);const p=P[s.i];const n=lista.indexOf(p.seccion)+1;
+    return `<div class="medalla">${PALOMA}</div><div class="eyebrow">Sección ${n} de ${lista.length}</div><h1>${esc(p.seccion)}</h1>${(C().secciones||{})[p.seccion]?`<p class="ayuda">${esc(C().secciones[p.seccion])}</p>`:""}
+      <button class="cta" data-sig>Continuar ${FLECHA}</button>`;
+  }
+  const p=P[s.i]; const v=r[p.id];
+  const cab=`<div class="eyebrow">${esc(p.seccion||"Pregunta")} · ${s.i+1}${p.obligatoria?"":" · opcional"}</div><h2>${esc(p.titulo)}</h2>${p.ayuda?`<p class="ayuda">${esc(p.ayuda)}</p>`:""}`;
+  const ops=Array.isArray(p.opciones)?p.opciones:[];
+  const listo=!p.obligatoria||(v!==undefined&&v!==""&&!(Array.isArray(v)&&!v.length));
+  const ultimo=s.i===P.length-1;
+  const textoSig=ultimo?"Enviar respuestas":"Siguiente";
+  switch(p.tipo){
+    case "opcion": return cab+`<div class="opciones ${ops.length<=4&&ops.every(o=>o.length<18)?"grid2":""}">${ops.map(o=>op(o,v===o)).join("")}</div>`+pieHTML(listo,textoSig);
+    case "likert": return cab+`<div class="opciones">${ops.map((o,k)=>op(o,v===o,k===Math.floor(ops.length/2)&&ops.length%2?"centro":"")).join("")}</div>`+pieHTML(listo,textoSig);
+    case "multiple": return cab+`<p class="ayuda">Puedes elegir varias.</p><div class="opciones">${ops.map(o=>op(o,Array.isArray(v)&&v.includes(o),"multi")).join("")}</div>`+pieHTML(listo,textoSig);
+    case "escala":{
+      const c=p.config||{};const min=+c.min||1,max=+c.max||10;const nums=[];for(let k=min;k<=max;k++)nums.push(k);
+      const cols=nums.length>6?5:nums.length;
+      return cab+`<div class="escala" style="grid-template-columns:repeat(${cols},1fr)">${nums.map(k=>`<button class="n ${v===k?"sel":v!==undefined&&k<v?"rango":""}" data-n="${k}" aria-label="${k}">${k}</button>`).join("")}</div>
+        <div class="extremos"><span>${min} · ${esc(c.etiqueta_min||"")}</span><span>${max} · ${esc(c.etiqueta_max||"")}</span></div>`+pieHTML(listo,textoSig);
+    }
+    case "emociones": return cab+`<div class="emos">${ops.map(o=>`<button class="emo ${v===o?"sel":""}" data-v="${esc(o)}"><span>${EMOJI[o.toLowerCase().trim()]||"💬"}</span>${esc(o)}</button>`).join("")}</div>`+pieHTML(listo,textoSig);
+    case "abierta": return cab+`<textarea id="txt-${p.id}" maxlength="1000" aria-label="Tu respuesta" placeholder="Escribe con libertad…">${esc(v||"")}</textarea>
+      <div class="contador"><span data-c>${(v||"").length}</span> / 1000</div>`+pieHTML(true,textoSig);
+  }
+  return cab+pieHTML(true,textoSig);
+}
+function op(t,sel,extra="",id=""){return `<button class="op ${sel?"sel":""} ${extra}" data-v="${esc(t)}" ${id?`data-id="${id}"`:""}><span class="dot">${CHECK}</span><span>${esc(t)}</span></button>`}
+
+function enlazar(el,s){
+  el.querySelectorAll("[data-sig]").forEach(b=>b.onclick=siguiente);
+  el.querySelectorAll("[data-atras]").forEach(b=>b.onclick=anterior);
+  const sig=()=>el.querySelector("[data-sig]");
+  if(s.tipo==="unidad"){
+    el.querySelectorAll(".op").forEach(b=>b.onclick=()=>{el.querySelectorAll(".op").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");onda(b);unidad=U.find(u=>u.id===b.dataset.id);sig().disabled=false;setTimeout(()=>{if(pant===s)siguiente()},480)});
+    return;
+  }
+  if(s.tipo!=="pregunta") return;
+  const p=P[s.i];
+  if(p.tipo==="multiple"){
+    el.querySelectorAll(".op").forEach(b=>b.onclick=()=>{const a=Array.isArray(r[p.id])?r[p.id]:[];const v=b.dataset.v;const i=a.indexOf(v);if(i>=0)a.splice(i,1);else a.push(v);r[p.id]=a;b.classList.toggle("sel");onda(b);sig().disabled=p.obligatoria&&!a.length});
+  }else{
+    el.querySelectorAll(".op,.emo").forEach(b=>b.onclick=()=>{el.querySelectorAll(".op,.emo").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");onda(b);r[p.id]=b.dataset.v;sig().disabled=false;
+      if(p.tipo!=="emociones"&&s.i<P.length-1) setTimeout(()=>{if(pant===s)siguiente()},480)});
+    el.querySelectorAll(".n").forEach(b=>b.onclick=()=>{const v=+b.dataset.n;r[p.id]=v;el.querySelectorAll(".n").forEach(x=>{const k=+x.dataset.n;x.classList.toggle("sel",k===v);x.classList.toggle("rango",k<v)});sig().disabled=false});
+  }
+  const ta=el.querySelector("textarea");if(ta)ta.oninput=()=>{el.querySelector("[data-c]").textContent=ta.value.length;r[p.id]=ta.value};
+}
+function onda(b){const o=document.createElement("span");o.className="ripple";const d=Math.max(b.offsetWidth,b.offsetHeight);o.style.width=o.style.height=d+"px";o.style.left=(b.offsetWidth-d)/2+"px";o.style.top=(b.offsetHeight-d)/2+"px";b.appendChild(o);setTimeout(()=>o.remove(),650)}
+function aviso(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("on");clearTimeout(aviso.t);aviso.t=setTimeout(()=>el.classList.remove("on"),2800)}
+
+/* ---------- envío ---------- */
+async function enviar(){
+  if(enviando) return; enviando=true;
+  const b=document.querySelector(".screen:not(.sale) [data-sig]");if(b){b.disabled=true;b.textContent="Enviando…"}
+  const datos={};
+  P.forEach(p=>{const v=r[p.id];if(v!==undefined&&v!==""&&!(Array.isArray(v)&&!v.length)) datos[p.id]=v});
+  if(PREVIA){ enviando=false; return gracias(true); }
+  let error=null;
+  try{({error}=await sb.from("respuestas").insert({encuesta_id:E.id,unidad:unidad?unidad.nombre:null,datos}));}catch(e){error=e}
+  enviando=false;
+  if(error){console.error(error);if(b){b.disabled=false;b.innerHTML="Reintentar envío "+FLECHA}aviso("No se pudo enviar. Revisa tu conexión y toca Reintentar.");return}
+  marcarRespondida(); gracias(false);
+}
+function gracias(previa){
+  pasos=[];pant={tipo:"gracias"};
+  const stage=document.getElementById("stage");stage.innerHTML="";
+  const el=document.createElement("section");el.className="screen entra seccion";
+  el.innerHTML=`<div class="medalla">${PALOMA}</div><h1>¡Gracias por tu tiempo!</h1>
+    <p class="ayuda">${previa?"Esta fue una vista previa: no se guardó ninguna respuesta.":esc(C().mensaje_gracias||"Tu respuesta quedó registrada. Tu opinión ayuda a construir un mejor lugar para trabajar.")}</p>`;
+  stage.appendChild(el);progreso();confeti();
+}
+function pantallaYaRespondio(){
+  pant={tipo:"gracias"};progreso();
+  const stage=document.getElementById("stage");stage.innerHTML="";
+  const el=document.createElement("section");el.className="screen entra seccion";
+  el.innerHTML=`<img src="logo.png" alt="Garnier, Enhancing Land" style="width:130px"><h1>Ya respondiste esta encuesta</h1>
+    <p class="ayuda">${esc(C().mensaje_ya_respondio||"En este dispositivo ya se envió una respuesta. ¡Gracias por participar!")}</p>
+    <button class="link" data-otra>Este dispositivo es compartido: responder como otra persona</button>`;
+  stage.appendChild(el);
+  el.querySelector("[data-otra]").onclick=()=>ir({tipo:"portada"});
+}
+function pantallaSimple(t,txt,reintentar){
+  pant={tipo:"gracias"};
+  const stage=document.getElementById("stage");stage.innerHTML="";
+  const el=document.createElement("section");el.className="screen entra seccion";
+  el.innerHTML=`<img src="logo.png" alt="Garnier, Enhancing Land" style="width:130px"><h1>${esc(t)}</h1><p class="ayuda">${esc(txt)}</p>${reintentar?'<button class="cta" onclick="location.reload()">Reintentar</button>':""}`;
+  stage.appendChild(el);
+}
+function confeti(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c=document.getElementById("confeti");c.hidden=false;const x=c.getContext("2d");const d=devicePixelRatio||1;
+  const W=c.width=innerWidth*d,H=c.height=innerHeight*d;const cols=["#B2D234","#003C40","#58585B","#D7E98F"];
+  const ps=Array.from({length:150},()=>({x:W*(.2+Math.random()*.6),y:H*.35,vx:(Math.random()-.5)*14*d,vy:(-Math.random()*16-4)*d,w:(5+Math.random()*7)*d,h:(3+Math.random()*4)*d,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:cols[Math.random()*4|0]}));
+  let t=0;(function f(){x.clearRect(0,0,W,H);ps.forEach(p=>{p.vy+=.45*d;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()});if(++t<220)requestAnimationFrame(f);else c.hidden=true})();
+}
+cargar();
+</script>
+</body>
+</html>

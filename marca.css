@@ -1,0 +1,39 @@
+/* Garnier & Garnier · tokens de marca (Manual de Marca)
+   Verde Pantone 583 C · Gris Pantone 425 C · Verde petróleo Pantone 2217 C · blanco protagonista
+   Tipografía de marca: Hurme Geometric Sans 3 (sustituto web: Jost) */
+:root{
+  --verde:#B2D234;
+  --verde-suave:#EEF6D2;
+  --verde-medio:#D7E98F;
+  --gris:#58585B;
+  --gris-claro:#E6E7E3;
+  --gris-linea:#D5D7D0;
+  --petroleo:#003C40;
+  --petroleo-hover:#00555A;
+  --blanco:#FFFFFF;
+  --fondo:#FAFBF7;
+  --rojo:#B3412E;
+  --ambar:#C98A12;
+  --font:"Jost","Hurme Geometric Sans 3","Century Gothic","Futura",system-ui,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--fondo);color:var(--gris);font-family:var(--font);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--verde);outline-offset:2px;border-radius:8px}
+h1,h2,h3{font-weight:300;letter-spacing:.02em;color:var(--petroleo);text-wrap:balance;margin:0}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--petroleo);font-weight:500}
+.eyebrow::before{content:"";width:30px;height:1.5px;background:var(--verde);transform:rotate(-27deg);transform-origin:right center}
+.cta{appearance:none;border:0;background:var(--petroleo);color:var(--blanco);font-weight:500;letter-spacing:.03em;padding:14px 24px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s var(--ease),background .2s}
+.cta:hover{background:var(--petroleo-hover)}
+.cta:active{transform:scale(.97)}
+.cta[disabled]{opacity:.35;cursor:not-allowed}
+.btn{appearance:none;border:1.5px solid var(--gris-linea);background:var(--blanco);color:var(--petroleo);padding:9px 14px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:14.5px;transition:border-color .2s,background .2s}
+.btn:hover{border-color:var(--verde)}
+.btn.peligro{color:var(--rojo)}
+.btn.peligro:hover{border-color:var(--rojo)}
+.link{background:none;border:0;color:var(--gris);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 0}
+.barra-marca{position:fixed;right:0;bottom:0;width:38%;height:8px;background:var(--verde);pointer-events:none;z-index:1}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
