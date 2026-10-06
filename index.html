@@ -79,14 +79,54 @@ textarea:focus{outline:none;border-color:var(--verde)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .aviso-previa{position:sticky;top:0;z-index:3;background:var(--petroleo);color:var(--blanco);font-size:13px;text-align:center;padding:8px 12px;border-radius:0 0 10px 10px}
 .error{color:var(--rojo);font-size:14px}
+/* ---- computadora: panel de marca a la izquierda ---- */
+.marco{display:none}
+@media (min-width:980px){
+  body{display:grid;grid-template-columns:minmax(360px,40%) minmax(0,1fr);min-height:100%}
+  .marco{display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh;overflow:hidden;background:var(--petroleo);color:#CFE0DF;padding:48px 52px}
+  .marco img{height:50px;width:auto;align-self:flex-start}
+  .marco .eyebrow{color:var(--verde)}
+  .marco .eyebrow::before{background:var(--verde)}
+  .marco h2{color:var(--blanco);font-size:clamp(28px,2.6vw,40px);line-height:1.15;margin-top:10px}
+  .marco ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;overflow:auto;position:relative;z-index:1}
+  .marco li{display:flex;align-items:center;gap:12px;font-size:15px;padding:6px 0;color:#9FBDBB;transition:color .3s}
+  .marco li i{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid #4B7577;display:grid;place-items:center;font-style:normal;font-size:12px;transition:all .3s}
+  .marco li.hecha{color:#CFE0DF}.marco li.hecha i{background:var(--verde);border-color:var(--verde);color:var(--petroleo)}
+  .marco li.actual{color:var(--blanco);font-weight:500}.marco li.actual i{border-color:var(--verde);box-shadow:0 0 0 4px rgba(178,210,52,.25)}
+  .marco .l1,.marco .l2{position:absolute;height:1.5px;background:var(--verde);transform:rotate(-27deg);transform-origin:left;opacity:.9}
+  .marco .l1{width:45%;right:-10%;bottom:12%}.marco .l2{width:35%;right:-12%;top:5%}
+  .marco .pie-marco{margin-top:auto;font-size:13px;color:#9FBDBB;position:relative;z-index:1}
+  .app{max-width:680px;width:100%;padding-inline:56px;justify-self:center}
+  .stage{align-content:center}
+  .screen{padding-block:5vh 24px}
+  .top img,.portada .logo,.diagonal{display:none!important}
+  .barra-marca{width:22%}
+}
+/* aviso rojo tipo SweetAlert */
+.alerta-fondo{position:fixed;inset:0;background:rgba(0,40,43,.45);z-index:50;display:grid;place-items:center;padding:20px;animation:fondoIn .2s ease both}
+.alerta-fondo.sale{animation:fondoOut .2s ease both}
+.alerta{background:var(--blanco);border-radius:18px;max-width:420px;width:100%;padding:30px 26px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.2);animation:alertaIn .35s var(--ease) both}
+.alerta-ico{width:76px;height:76px;border-radius:50%;border:4px solid #F2B8AE;color:var(--rojo);display:grid;place-items:center;animation:sacude .5s .15s ease both}
+.alerta h3{font-size:23px;font-weight:500;color:var(--rojo)}
+.alerta p{margin:0;font-size:16px;color:var(--gris)}
+.alerta .cta{margin-top:8px;background:var(--rojo);min-width:160px}
+.alerta .cta:hover{background:#952F1F}
+@keyframes alertaIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@keyframes fondoIn{from{opacity:0}}@keyframes fondoOut{to{opacity:0}}
+@keyframes sacude{0%,100%{transform:none}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+textarea.invalido{border-color:var(--rojo);box-shadow:0 0 0 3px #FBE3DE}
+.contador{display:flex;justify-content:space-between;gap:12px}
+.minimo{color:var(--rojo)}.minimo.ok{color:#5E7A14}
 canvas#confeti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
 .cargando{display:grid;place-items:center;min-height:60vh}
 .spinner{width:36px;height:36px;border-radius:50%;border:3px solid var(--gris-claro);border-top-color:var(--verde);animation:gira 1s linear infinite}
 @keyframes gira{to{transform:rotate(360deg)}}
 body.en-portada .diagonal{display:block}
+h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus{outline:none}
 </style>
 </head>
 <body>
+<aside class="marco" id="marco" aria-hidden="true"><span class="l1"></span><span class="l2"></span><img src="logo-horizontal-blanco.png" alt=""><div><div class="eyebrow">Encuesta de clima</div><h2 id="marco-tit">Garnier &amp; Garnier</h2></div><ol id="marco-secs"></ol><p class="pie-marco">Tus respuestas se manejan con confidencialidad.</p></aside>
 <div class="diagonal" aria-hidden="true"></div>
 <div class="app">
   <div id="previa" hidden></div>
@@ -137,7 +177,7 @@ async function cargar(){
       sb.from("unidades").select("*").eq("encuesta_id",E.id).order("orden")
     ]);
     if(e1||e2) throw (e1||e2);
-    P=pr||[]; U=un||[];
+    P=(pr||[]).filter(listaParaMostrar); U=un||[];
     unidad=U.find(u=>u.slug===slugPedido)||null;
     document.title=E.titulo;
     if(!PREVIA && yaRespondio()) return pantallaYaRespondio();
@@ -185,7 +225,13 @@ function siguientePantalla(){
   return {tipo:"fin"};
 }
 function siguiente(){
-  if(pant.tipo==="pregunta"&&P[pant.i].tipo==="abierta"){const ta=document.querySelector(".screen:not(.sale) textarea");if(ta) r[P[pant.i].id]=ta.value.trim();}
+  if(pant.tipo==="pregunta"&&P[pant.i].tipo==="abierta"){
+    const p=P[pant.i];const ta=document.querySelector(".screen:not(.sale) textarea");
+    const v=ta?ta.value.trim():"";
+    const problema=revisarTexto(p,v);
+    if(problema){alerta(problema[0],problema[1],()=>ta&&ta.focus());if(ta)ta.classList.add("invalido");return}
+    r[p.id]=v;
+  }
   const n=siguientePantalla();
   if(n.tipo==="fin") return enviar();
   pasos.push(pant); ir(n);
@@ -211,6 +257,15 @@ function progreso(){
   const i=pant.tipo==="pregunta"||pant.tipo==="seccion"?pant.i:pant.tipo==="unidad"?0:P.length;
   document.getElementById("barra").style.width=(P.length?Math.round(i/P.length*100):0)+"%";
   document.getElementById("count").textContent=pant.tipo==="pregunta"?(pant.i+1)+" / "+P.length:"";
+  marco();
+}
+function marco(){
+  const t=document.getElementById("marco-tit");if(t&&E)t.textContent=E.titulo;
+  const ol=document.getElementById("marco-secs");if(!ol||!E)return;
+  const lista=secciones().filter(Boolean);
+  const actual=(pant.tipo==="pregunta"||pant.tipo==="seccion")?(P[pant.i].seccion||""):null;
+  const ia=pant.tipo==="gracias"?lista.length:actual===null?-1:lista.indexOf(actual);
+  ol.innerHTML=lista.map((x,k)=>`<li class="${k<ia?"hecha":k===ia?"actual":""}"><i>${k<ia?"✓":k+1}</i>${esc(x)}</li>`).join("");
 }
 
 /* ---------- pantallas ---------- */
@@ -253,8 +308,9 @@ function render(s){
         <div class="extremos"><span>${min} · ${esc(c.etiqueta_min||"")}</span><span>${max} · ${esc(c.etiqueta_max||"")}</span></div>`+pieHTML(listo,textoSig);
     }
     case "emociones": return cab+`<div class="emos">${ops.map(o=>`<button class="emo ${v===o?"sel":""}" data-v="${esc(o)}"><span>${EMOJI[o.toLowerCase().trim()]||"💬"}</span>${esc(o)}</button>`).join("")}</div>`+pieHTML(listo,textoSig);
-    case "abierta": return cab+`<textarea id="txt-${p.id}" maxlength="1000" aria-label="Tu respuesta" placeholder="Escribe con libertad…">${esc(v||"")}</textarea>
-      <div class="contador"><span data-c>${(v||"").length}</span> / 1000</div>`+pieHTML(true,textoSig);
+    case "abierta":{const min=minimoTexto(p);
+      return cab+`<textarea id="txt-${p.id}" maxlength="1000" aria-label="Tu respuesta" placeholder="Escribe tu respuesta con tus propias palabras…">${esc(v||"")}</textarea>
+      <div class="contador">${min?`<span class="minimo" data-min>Mínimo ${min} caracteres</span>`:"<span></span>"}<span><span data-c>${(v||"").length}</span> / 1000</span></div>`+pieHTML(true,textoSig);}
   }
   return cab+pieHTML(true,textoSig);
 }
@@ -277,10 +333,46 @@ function enlazar(el,s){
       if(p.tipo!=="emociones"&&s.i<P.length-1) setTimeout(()=>{if(pant===s)siguiente()},480)});
     el.querySelectorAll(".n").forEach(b=>b.onclick=()=>{const v=+b.dataset.n;r[p.id]=v;el.querySelectorAll(".n").forEach(x=>{const k=+x.dataset.n;x.classList.toggle("sel",k===v);x.classList.toggle("rango",k<v)});sig().disabled=false});
   }
-  const ta=el.querySelector("textarea");if(ta)ta.oninput=()=>{el.querySelector("[data-c]").textContent=ta.value.length;r[p.id]=ta.value};
+  const ta=el.querySelector("textarea");if(ta)ta.oninput=()=>{const n=ta.value.trim().length;el.querySelector("[data-c]").textContent=ta.value.length;r[p.id]=ta.value;ta.classList.remove("invalido");const m=el.querySelector("[data-min]");if(m)m.classList.toggle("ok",n>=minimoTexto(p))};
 }
 function onda(b){const o=document.createElement("span");o.className="ripple";const d=Math.max(b.offsetWidth,b.offsetHeight);o.style.width=o.style.height=d+"px";o.style.left=(b.offsetWidth-d)/2+"px";o.style.top=(b.offsetHeight-d)/2+"px";b.appendChild(o);setTimeout(()=>o.remove(),650)}
 function aviso(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("on");clearTimeout(aviso.t);aviso.t=setTimeout(()=>el.classList.remove("on"),2800)}
+
+/* ---------- validación de respuestas escritas ---------- */
+const TEXTO_MUESTRA=["escribe aquí tu pregunta","nueva pregunta"];
+function listaParaMostrar(p){const t=(p.titulo||"").trim().toLowerCase();return t.length>0&&!TEXTO_MUESTRA.includes(t)}
+function minimoTexto(p){const c=p.config||{};if(c.minimo!==undefined&&c.minimo!==null&&c.minimo!=="")return Math.max(0,+c.minimo||0);return p.obligatoria?10:0}
+function pareceAlAzar(t){
+  const s=t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  const letras=s.replace(/[^a-zñ]/g,"");
+  if(letras.length<3) return true;
+  if(new Set(letras).size<4) return true;                       // "aaaaaaa", "jajajaja"
+  if(/(.)\1{3,}/.test(s)) return true;                           // misma letra 4+ veces seguidas
+  const vocales=(letras.match(/[aeiou]/g)||[]).length;
+  if(vocales/letras.length<0.2) return true;                     // "sdfghjkl", "qwrtyp"
+  if(/asdf|sdfg|dfgh|fghj|ghjk|hjkl|qwer|wert|erty|rtyu|tyui|zxcv|xcvb|cvbn|vbnm|1234|abcd/.test(s)) return true;
+  const palabras=s.split(/\s+/).filter(w=>/[a-zñ]/.test(w));
+  if(palabras.length>=3&&new Set(palabras).size===1) return true; // "hola hola hola"
+  if(palabras.some(w=>w.replace(/[^a-zñ]/g,"").length>25)) return true; // palabra sin espacios muy larga
+  return false;
+}
+function revisarTexto(p,v){
+  const min=minimoTexto(p);
+  if(!v){ return p.obligatoria?["Falta tu respuesta","Por favor escribe tu respuesta a esta pregunta para poder continuar."]:null; }
+  if(v.length<min) return ["Tu respuesta es muy corta",`Por favor escribe al menos ${min} caracteres. Cuéntanos un poco más con tus propias palabras.`];
+  if(pareceAlAzar(v)) return ["Revisa tu respuesta","Parece que el texto se escribió al azar. Por favor responde la pregunta con una idea clara."];
+  return null;
+}
+function alerta(titulo,texto,alCerrar){
+  const f=document.createElement("div");f.className="alerta-fondo";f.setAttribute("role","alertdialog");f.setAttribute("aria-modal","true");
+  f.innerHTML=`<div class="alerta"><div class="alerta-ico"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M14 14l16 16M30 14 14 30" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></div>
+    <h3>${esc(titulo)}</h3><p>${esc(texto)}</p><button class="cta" data-ok>Entendido</button></div>`;
+  document.body.appendChild(f);
+  const cerrar=()=>{f.classList.add("sale");setTimeout(()=>f.remove(),200);if(alCerrar)setTimeout(alCerrar,220)};
+  f.querySelector("[data-ok]").onclick=cerrar;f.onclick=e=>{if(e.target===f)cerrar()};
+  f.addEventListener("keydown",e=>{if(e.key==="Escape"||e.key==="Enter"){e.preventDefault();cerrar()}});
+  f.querySelector("[data-ok]").focus();
+}
 
 /* ---------- envío ---------- */
 async function enviar(){

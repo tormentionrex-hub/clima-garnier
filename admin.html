@@ -11,11 +11,19 @@
 <link rel="stylesheet" href="marca.css">
 <style>
 body{background:#F3F5EE}
-.wrap{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:0 90px}
 /* inicio de sesión */
-.login{min-height:100%;display:grid;place-items:center;padding:24px 16px}
+.login{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.login-marca{background:var(--petroleo);color:var(--blanco);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:48px 56px}
+.login-marca img{height:52px;width:auto;align-self:flex-start}
+.login-marca h2{color:var(--blanco);font-size:clamp(30px,3.2vw,46px);line-height:1.12;max-width:14ch}
+.login-marca p{color:#CFE0DF;max-width:44ch;font-size:16px}
+.login-marca .l1,.login-marca .l2{position:absolute;height:1.5px;background:var(--verde);transform:rotate(-27deg);transform-origin:left}
+.login-marca .l1{width:42%;right:-8%;bottom:14%}.login-marca .l2{width:30%;right:-12%;top:5%}
+.login-marca .barra{position:absolute;right:0;bottom:0;width:40%;height:8px;background:var(--verde)}
+.login-form{display:grid;place-items:center;padding:24px 16px}
+@media (max-width:860px){.login{grid-template-columns:1fr}.login-marca{padding:28px 24px;gap:18px}.login-marca h2{font-size:28px}.login-marca .l1,.login-marca .l2{display:none}}
 .login form{width:100%;max-width:390px;background:var(--blanco);border-radius:18px;padding:32px 26px;display:flex;flex-direction:column;gap:16px;border-top:6px solid var(--verde);box-shadow:0 10px 30px rgba(0,60,64,.08)}
-.login img{width:120px}
+.login form h1{font-size:28px}
 label.campo{display:flex;flex-direction:column;gap:6px;font-size:14px;min-width:0}
 .campo input,.campo select,.campo textarea,input.txt,select.txt,textarea.txt{border:1.5px solid var(--gris-linea);border-radius:10px;padding:11px 12px;background:var(--blanco);color:var(--petroleo);width:100%}
 .campo input:focus,input.txt:focus,select.txt:focus,textarea.txt:focus{outline:none;border-color:var(--verde);box-shadow:0 0 0 3px var(--verde-suave)}
@@ -28,25 +36,55 @@ textarea.txt{resize:vertical;min-height:70px}
 .etq{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--gris)}
 .etq b{font-weight:500;color:var(--petroleo)}
 .nota{font-size:13px;color:#7C7E78;margin:0}
-/* cabecera */
-header.cab{position:sticky;top:0;z-index:10;background:var(--blanco);border-bottom:1px solid var(--gris-claro);padding-top:env(safe-area-inset-top,0px)}
-.cab-in{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.cab-in img{width:30px}
-.cab-tit{flex:1;min-width:180px;display:flex;flex-direction:column}
-.cab-tit label{font-size:11.5px;color:#7C7E78;letter-spacing:.06em;text-transform:uppercase}
-.cab-tit select{border:0;background:transparent;font-weight:500;color:var(--petroleo);font-size:16px;padding:2px 0;max-width:100%;cursor:pointer}
-.guardado{font-size:12.5px;color:var(--gris)}
-.cab-acc{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.estado-caja{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
-.estado-caja small{font-size:11.5px;color:#7C7E78}
-.estado{display:inline-flex;border:1.5px solid var(--gris-linea);border-radius:999px;overflow:hidden;font-size:13.5px}
-.estado button{border:0;background:transparent;padding:7px 12px;cursor:pointer;color:var(--gris)}
+/* barra superior */
+header.cab{position:sticky;top:0;z-index:10;background:var(--blanco);border-bottom:1px solid var(--gris-claro);padding-top:env(safe-area-inset-top,0px);box-shadow:0 2px 12px rgba(0,60,64,.04)}
+.cab-in,.cab-sub,.layout{max-width:1380px;margin:0 auto;padding-inline:32px}
+.cab-in{display:flex;align-items:center;gap:20px;min-height:72px;padding-block:10px}
+.marca-cab{display:flex;align-items:center;gap:18px;flex:none}
+.marca-cab img{height:38px;width:auto;display:block}
+.marca-cab .div{width:1px;height:34px;background:var(--gris-claro)}
+.marca-cab .app{display:flex;flex-direction:column;line-height:1.2}
+.marca-cab .app b{font-weight:500;color:var(--petroleo);font-size:15.5px}
+.marca-cab .app small{font-size:12px;color:#7C7E78;letter-spacing:.06em;text-transform:uppercase}
+.cab-der{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.estado-caja{display:flex;align-items:center;gap:10px;padding-right:12px;margin-right:2px;border-right:1px solid var(--gris-claro)}
+.estado-caja small{font-size:12.5px;color:#7C7E78;max-width:150px;line-height:1.25}
+.estado{display:inline-flex;border:1.5px solid var(--gris-linea);border-radius:999px;overflow:hidden;font-size:13.5px;flex:none}
+.estado button{border:0;background:transparent;padding:7px 14px;cursor:pointer;color:var(--gris)}
 .estado button.on{background:var(--petroleo);color:var(--blanco)}
 .estado button.on[data-e="abierta"]{background:var(--verde);color:var(--petroleo);font-weight:500}
-.tabs{display:flex;justify-content:center;gap:2px;max-width:1100px;margin:0 auto;overflow-x:auto}
-.tabs button{border:0;background:none;padding:10px 16px;cursor:pointer;color:var(--gris);border-bottom:3px solid transparent;font-weight:500;white-space:nowrap}
+.cta.sm{padding:9px 16px;font-size:14.5px;border-radius:10px}
+.usuario{display:flex;align-items:center;gap:8px;padding-left:12px;border-left:1px solid var(--gris-claro)}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--verde-suave);color:var(--petroleo);display:grid;place-items:center;font-weight:600;font-size:14px;flex:none}
+.cab-sub{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px;border-top:1px solid var(--gris-claro)}
+.sel-enc{display:flex;align-items:center;gap:10px;min-width:0}
+.sel-enc label{font-size:12px;color:#7C7E78;letter-spacing:.06em;text-transform:uppercase;flex:none}
+.sel-enc select{border:1.5px solid var(--gris-claro);border-radius:10px;background:var(--blanco);font-weight:500;color:var(--petroleo);font-size:14.5px;padding:7px 10px;max-width:100%;min-width:0;cursor:pointer}
+.guardado{font-size:13px;color:var(--gris);justify-self:end;display:flex;align-items:center;gap:8px}
+.guardado::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--verde)}
+.tabs{display:flex;gap:4px}
+.tabs button{border:0;background:none;padding:14px 18px 12px;cursor:pointer;color:var(--gris);border-bottom:3px solid transparent;font-weight:500;white-space:nowrap;font-size:15px}
+.tabs button:hover{color:var(--petroleo)}
 .tabs button.on{color:var(--petroleo);border-bottom-color:var(--verde)}
-.badge{display:inline-grid;place-items:center;min-width:22px;height:20px;padding:0 6px;border-radius:999px;background:var(--verde-suave);color:var(--petroleo);font-size:12px;margin-left:4px;font-variant-numeric:tabular-nums}
+.badge{display:inline-grid;place-items:center;min-width:22px;height:20px;padding:0 6px;border-radius:999px;background:var(--verde-suave);color:var(--petroleo);font-size:12px;margin-left:6px;font-variant-numeric:tabular-nums}
+/* distribución con columna lateral */
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:36px;padding-block:8px 90px;align-items:start}
+.layout>main{max-width:880px;width:100%;min-width:0}
+.lado{position:sticky;top:150px;display:flex;flex-direction:column;gap:14px;margin-top:16px;max-height:calc(100vh - 170px);overflow:auto;padding-bottom:10px}
+.lado-card{background:var(--blanco);border:1px solid var(--gris-claro);border-radius:14px;padding:16px}
+.lado-card h4{margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#7C7E78;font-weight:500}
+.cifras{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cifras div{display:flex;flex-direction:column}
+.cifras strong{font-size:24px;font-weight:400;color:var(--petroleo);font-variant-numeric:tabular-nums;line-height:1.1}
+.cifras span{font-size:12.5px}
+.indice{display:flex;flex-direction:column;gap:2px}
+.indice button{appearance:none;border:0;background:none;text-align:left;padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;gap:8px;font-size:14px;color:var(--petroleo)}
+.indice button:hover,.indice button.on{background:var(--verde-suave)}
+.indice button span{color:#7C7E78;font-variant-numeric:tabular-nums;font-size:13px}
+.lado .cta,.lado .btn{width:100%;justify-content:center}
+.wrap{max-width:880px;margin:0 auto;padding-inline:16px;padding-block:0 90px}
+@media (max-width:1100px){.layout{grid-template-columns:minmax(0,1fr);gap:0}.lado{display:none}.layout>main{margin:0 auto}.estado-caja small{display:none}}
+@media (max-width:760px){.cab-in,.cab-sub,.layout{padding-inline:16px}.marca-cab .div,.marca-cab .app{display:none}.cab-sub{grid-template-columns:1fr}.guardado{justify-self:start;padding-bottom:6px}.tabs{overflow-x:auto}.usuario span{display:none}.estado-caja{border:0;padding:0}}
 /* tarjetas */
 .tarjeta{background:var(--blanco);border-radius:14px;border:1px solid var(--gris-claro);margin-top:14px;position:relative;transition:box-shadow .2s,border-color .2s}
 .bloque{padding:20px 22px;display:flex;flex-direction:column;gap:14px}
@@ -70,6 +108,8 @@ header.cab{position:sticky;top:0;z-index:10;background:var(--blanco);border-bott
 .preg .rt{flex:1;color:var(--petroleo);min-width:0}
 .preg .rt small{display:block;color:var(--gris);font-size:13px;margin-top:3px}
 .obl{color:var(--rojo)}
+.pendiente{display:inline-block;background:#FBEDEA;color:var(--rojo);font-size:12.5px;border-radius:999px;padding:3px 10px;margin-bottom:6px}
+.preg.incompleta{border:1.5px dashed #E5A99D}
 .mini-ops{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-left:40px}
 .mini-ops span{font-size:12.5px;border:1px solid var(--gris-claro);border-radius:999px;padding:2px 10px}
 .editor{display:flex;flex-direction:column;gap:16px}
@@ -148,6 +188,7 @@ textarea.titq{font-size:17px;min-height:56px;background:#F7F8F4}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .vacio{text-align:center;padding:40px 20px;color:var(--gris)}
 @media (max-width:560px){.bar{grid-template-columns:1fr 64px}.bar .tr{grid-column:1/-1;grid-row:2}.pie-ed .sep{display:none}}
+h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus{outline:none}
 </style>
 </head>
 <body>
@@ -212,14 +253,17 @@ async function iniciar(){
   pantallaLogin();
 }
 function pantallaLogin(msg=""){
-  $("#app").innerHTML=`<div class="login"><form id="f-login" novalidate>
-    <img src="logo.png" alt="Garnier, Enhancing Land">
-    <div><div class="eyebrow">Encuesta de clima</div><h1 style="font-size:26px;margin-top:6px">Panel de administración</h1></div>
+  $("#app").innerHTML=`<div class="login"><section class="login-marca"><span class="l1"></span><span class="l2"></span><span class="barra"></span>
+    <img src="logo-horizontal-blanco.png" alt="Garnier, Enhancing Land">
+    <div><div class="eyebrow" style="color:var(--verde)">Encuesta de clima organizacional</div><h2 style="margin-top:12px">Panel de administración</h2></div>
+    <p>Edita las preguntas, abre o cierra la encuesta, comparte los enlaces por área y revisa los resultados en un solo lugar.</p></section>
+    <div class="login-form"><form id="f-login" novalidate>
+    <div><h1>Iniciar sesión</h1><p class="nota" style="margin-top:6px">Usa el correo y la contraseña que te asignaron.</p></div>
     <label class="campo">Correo<input id="l-correo" type="email" autocomplete="username" required></label>
     <label class="campo">Contraseña<input id="l-clave" type="password" autocomplete="current-password" required></label>
     <div class="error" id="l-error">${esc(msg)}</div>
     <button class="cta" type="submit">Entrar</button>
-  </form></div><div class="barra-marca"></div>`;
+  </form></div></div>`;
   $("#f-login").onsubmit=async e=>{
     e.preventDefault();const b=e.target.querySelector("button");b.disabled=true;b.textContent="Entrando…";
     const {data,error}=await sb.auth.signInWithPassword({email:$("#l-correo").value.trim(),password:$("#l-clave").value});
@@ -283,30 +327,39 @@ function pintar(){
     $("#app").innerHTML=cabecera()+`<div class="wrap"><div class="tarjeta vacio"><h2>No hay encuestas todavía</h2><p>Crea la primera para empezar.</p><button class="cta" data-nueva>Crear encuesta</button></div></div>`;
     enlazarCab();return;
   }
-  $("#app").innerHTML=cabecera()+`<div class="wrap" id="cuerpo"></div>`;
+  $("#app").innerHTML=cabecera()+`<div class="layout"><aside class="lado" id="lado" aria-label="Resumen"></aside><main id="cuerpo"></main></div>`;
   enlazarCab();
   ({preguntas:pintarPreguntas,mensajes:pintarMensajes,respuestas:pintarRespuestas})[S.tab]();
 }
 function cabecera(){
   const E=S.E;
   const ayudaEstado={borrador:"Nadie puede responder todavía",abierta:"El personal ya puede responder",cerrada:"Ya no recibe respuestas"};
+  const correo=(S.user&&S.user.email)||"";
   return `<header class="cab"><div class="cab-in">
-    <img src="isotipo.png" alt="Garnier">
-    <div class="cab-tit">
-      <label for="sel-enc">Encuesta</label>
-      <select id="sel-enc">${S.encuestas.map(e=>`<option value="${e.id}" ${E&&e.id===E.id?"selected":""}>${esc(e.titulo)}</option>`).join("")}<option value="__nueva">+ Crear otra encuesta…</option></select>
-      <span class="guardado" id="guardado">${E?"Todos los cambios se guardaron":""}</span>
-    </div>
-    ${E?`<div class="estado-caja"><div class="estado" role="group" aria-label="Estado de la encuesta">${["borrador","abierta","cerrada"].map(s=>`<button data-e="${s}" class="${E.estado===s?"on":""}">${{borrador:"Borrador",abierta:"Abierta",cerrada:"Cerrada"}[s]}</button>`).join("")}</div><small>${ayudaEstado[E.estado]}</small></div>
-    <div class="cab-acc">
+    <div class="marca-cab"><img src="logo-horizontal.png" alt="Garnier, Enhancing Land"><span class="div"></span><div class="app"><small>Clima organizacional</small><b>Panel de administración</b></div></div>
+    <div class="cab-der">
+      ${E?`<div class="estado-caja"><div class="estado" role="group" aria-label="Estado de la encuesta">${["borrador","abierta","cerrada"].map(s=>`<button data-e="${s}" class="${E.estado===s?"on":""}">${{borrador:"Borrador",abierta:"Abierta",cerrada:"Cerrada"}[s]}</button>`).join("")}</div><small>${ayudaEstado[E.estado]}</small></div>
       <a class="btn" href="index.html?previa=${E.id}" target="_blank" rel="noopener">Ver como el personal</a>
-      <button class="btn" data-compartir>Compartir</button>
-      <button class="btn" data-salir>Salir</button>
-    </div>`:`<button class="btn" data-salir>Salir</button>`}
+      <button class="cta sm" data-compartir>Compartir</button>`:""}
+      <div class="usuario" title="${esc(correo)}"><span class="avatar">${esc(correo.slice(0,1).toUpperCase())}</span><button class="btn sm" data-salir>Salir</button></div>
+    </div>
   </div>
-  ${E?`<nav class="tabs"><button data-tab="preguntas" class="${S.tab==="preguntas"?"on":""}">Preguntas</button><button data-tab="mensajes" class="${S.tab==="mensajes"?"on":""}">Mensajes y áreas</button><button data-tab="respuestas" class="${S.tab==="respuestas"?"on":""}">Respuestas<span class="badge">${S.R.length}</span></button></nav>`:""}
+  ${E?`<div class="cab-sub">
+    <div class="sel-enc"><label for="sel-enc">Encuesta</label><select id="sel-enc">${S.encuestas.map(e=>`<option value="${e.id}" ${e.id===E.id?"selected":""}>${esc(e.titulo)}</option>`).join("")}<option value="__nueva">+ Crear otra encuesta…</option></select></div>
+    <nav class="tabs"><button data-tab="preguntas" class="${S.tab==="preguntas"?"on":""}">Preguntas</button><button data-tab="mensajes" class="${S.tab==="mensajes"?"on":""}">Mensajes y áreas</button><button data-tab="respuestas" class="${S.tab==="respuestas"?"on":""}">Respuestas<span class="badge">${S.R.length}</span></button></nav>
+    <span class="guardado" id="guardado">Todos los cambios se guardaron</span>
+  </div>`:""}
   </header>`;
 }
+/* columna lateral */
+function irA(id){const el=document.getElementById(id);if(el){const y=el.getBoundingClientRect().top+scrollY-160;scrollTo({top:y,behavior:"smooth"})}}
+function ladoResumen(){
+  const E=S.E;const nsec=secciones().length;
+  return `<div class="lado-card"><h4>Esta encuesta</h4><div class="cifras">
+    <div><strong>${S.P.length}</strong><span>preguntas</span></div><div><strong>${nsec}</strong><span>secciones</span></div>
+    <div><strong>${S.U.length}</strong><span>áreas</span></div><div><strong>${S.R.length}</strong><span>respuestas</span></div></div></div>`;
+}
+function pintarLado(html){const l=$("#lado");if(!l)return;l.innerHTML=html;l.querySelectorAll("[data-ir]").forEach(b=>b.onclick=()=>irA(b.dataset.ir));}
 function enlazarCab(){
   document.querySelectorAll("[data-salir]").forEach(b=>b.onclick=salir);
   document.querySelectorAll("[data-nueva]").forEach(b=>b.onclick=()=>dialogoNueva());
@@ -399,6 +452,11 @@ function pintarPreguntas(){
   const ns=c.querySelector("[data-nueva-seccion]");if(ns)ns.onclick=nuevaSeccion;
   const ed=c.querySelector(".preg.abierta");if(ed)enlazarEditor(ed);
   const se=c.querySelector(".sec-ed");if(se)enlazarSeccion(se);
+  const sinSec=S.P.filter(p=>!p.seccion).length;
+  pintarLado(ladoResumen()+`<div class="lado-card"><h4>Secciones</h4><div class="indice">${secciones().map(x=>`<button data-ir="s-${slugify(x)}">${esc(x)}<span>${S.P.filter(p=>p.seccion===x).length}</span></button>`).join("")||'<p class="nota">Sin secciones todavía.</p>'}${sinSec&&secciones().length?`<p class="nota" style="padding:6px 10px">${sinSec} pregunta${sinSec>1?"s":""} sin sección</p>`:""}</div></div>
+    <div class="lado-card" style="display:flex;flex-direction:column;gap:8px"><button class="cta sm" data-lado-preg>+ Agregar pregunta</button><button class="btn" data-lado-sec>+ Agregar sección</button></div>`);
+  const lp=$("[data-lado-preg]");if(lp)lp.onclick=()=>{S.menuTipos=S.P.length-1;S.abierta=null;pintarPreguntas();const m=document.querySelector(".menu-tipos");if(m)m.scrollIntoView({block:"center",behavior:"smooth"})};
+  const ls=$("[data-lado-sec]");if(ls)ls.onclick=nuevaSeccion;
 }
 function abrirPregunta(id){S.abierta=id;S.menuTipos=null;S.borrar=null;S.secEd=null;pintarPreguntas();const a=document.querySelector(".preg.abierta");if(a){a.scrollIntoView({block:"nearest",behavior:"smooth"});const t=a.querySelector("[data-titulo]");if(t)t.focus()}}
 
@@ -406,7 +464,7 @@ function abrirPregunta(id){S.abierta=id;S.menuTipos=null;S.borrar=null;S.secEd=n
 function seccionHTML(s){
   const intro=(cfgE().secciones||{})[s]||"";
   const n=S.P.filter(p=>p.seccion===s).length;
-  if(S.secEd===s) return `<div class="sec"><div class="sec-ed" data-sec="${esc(s)}">
+  if(S.secEd===s) return `<div class="sec" id="s-${slugify(s)}"><div class="sec-ed" data-sec="${esc(s)}">
     ${etiqueta("Nombre de la sección","sec-nombre","aparece como título antes de sus preguntas")}
     <input class="txt" id="sec-nombre" value="${esc(s)}">
     ${etiqueta("Texto de introducción","sec-intro","opcional, lo ve el personal al entrar a la sección")}
@@ -414,7 +472,7 @@ function seccionHTML(s){
     ${S.borrar==="sec:"+s?`<div class="confirmar">¿Quitar la sección? Sus ${n} preguntas se conservan, solo dejan de estar agrupadas. <button class="btn peligro sm" data-sec-quitar-si>Sí, quitar</button><button class="btn sm" data-sec-quitar-no>Cancelar</button></div>`:""}
     <div class="pie-ed"><button class="btn sm peligro" data-sec-quitar>${ICO.borrar} Quitar sección</button><span class="sep"></span><button class="cta" data-sec-listo>Listo</button></div>
   </div></div>`;
-  return `<div class="sec"><div class="sec-cab"><span class="sec-nombre">${esc(s)}</span>${editar("sec:"+s,"Editar sección")}</div>${intro?`<p class="sec-intro">${esc(intro)}</p>`:""}</div>`;
+  return `<div class="sec" id="s-${slugify(s)}"><div class="sec-cab"><span class="sec-nombre">${esc(s)}</span>${editar("sec:"+s,"Editar sección")}</div>${intro?`<p class="sec-intro">${esc(intro)}</p>`:""}</div>`;
 }
 function enlazarSeccion(el){
   const viejo=S.secEd;
@@ -451,6 +509,8 @@ async function nuevaSeccion(){
 }
 
 /* --- preguntas --- */
+const TEXTO_MUESTRA=["escribe aquí tu pregunta","nueva pregunta"];
+const sinTerminar=p=>{const t=(p.titulo||"").trim().toLowerCase();return !t||TEXTO_MUESTRA.includes(t)};
 function resumenHTML(p,i){
   const ops=Array.isArray(p.opciones)?p.opciones:[];
   const saltos=p.config&&p.config.saltos?Object.keys(p.config.saltos).length:0;
@@ -458,7 +518,8 @@ function resumenHTML(p,i){
   if(p.tipo==="escala") detalle=`Calificación del ${p.config.min??1} al ${p.config.max??10}${p.config.nps?" · se usa para el NPS":""}`;
   if(saltos) detalle+=` · lleva a otra pregunta según la respuesta`;
   if(!p.obligatoria) detalle+=" · opcional";
-  return `<div class="tarjeta preg" data-id="${p.id}" tabindex="0"><div class="resumen"><span class="num">${i+1}.</span><div class="rt">${esc(p.titulo)}${p.obligatoria?' <span class="obl" title="Obligatoria">*</span>':""}<small>${esc(detalle)}</small></div>${editar("preg:"+p.id)}</div>
+  const aviso=sinTerminar(p)?`<span class="pendiente">Sin terminar: el personal no la verá hasta que escribas la pregunta</span>`:"";
+  return `<div class="tarjeta preg ${sinTerminar(p)?"incompleta":""}" data-id="${p.id}" tabindex="0"><div class="resumen"><span class="num">${i+1}.</span><div class="rt">${aviso}${esc(p.titulo)}${p.obligatoria?' <span class="obl" title="Obligatoria">*</span>':""}<small>${esc(detalle)}</small></div>${editar("preg:"+p.id)}</div>
     ${ops.length&&p.tipo!=="likert"?`<div class="mini-ops">${ops.slice(0,6).map(o=>`<span>${esc(o)}</span>`).join("")}${ops.length>6?`<span>+${ops.length-6} más</span>`:""}</div>`:""}</div>`;
 }
 function menuTiposHTML(i){
@@ -490,10 +551,12 @@ function editorHTML(p,i){
       <div class="campo grow">${etiqueta("Texto del número más alto","cfg-max-"+p.id)}<input class="txt" id="cfg-max-${p.id}" data-cfg="etiqueta_max" value="${esc(c.etiqueta_max||"")}" placeholder="Por ejemplo: Muy probable"></div></div>
       <label class="switch"><input type="checkbox" data-nps ${c.nps?"checked":""}> Usar esta pregunta para calcular el NPS (índice de recomendación)</label>`;
   }else{
-    cuerpo=`<p class="nota">La persona escribe su respuesta con sus propias palabras.</p>`;
+    const c=p.config||{};const min=c.minimo??(p.obligatoria?10:0);
+    cuerpo=`<p class="nota">La persona escribe su respuesta con sus propias palabras. Si es obligatoria, no puede avanzar con el campo vacío ni con textos escritos al azar.</p>
+      <div class="campo" style="max-width:320px">${etiqueta("Mínimo de caracteres","min-"+p.id)}<input class="txt" type="number" min="0" max="500" id="min-${p.id}" data-minimo value="${min}"></div>`;
   }
   return `<div class="tarjeta preg abierta" data-id="${p.id}"><div class="editor">
-    ${etiqueta("Pregunta","tq-"+p.id)}
+    ${etiqueta("Pregunta","tq-"+p.id)}${sinTerminar(p)?'<span class="pendiente">Escribe la pregunta: mientras diga "Escribe aquí tu pregunta", el personal no la verá.</span>':""}
     <textarea class="txt titq" id="tq-${p.id}" data-titulo rows="2">${esc(p.titulo)}</textarea>
     <div class="campo">${etiqueta("Tipo de respuesta","tp-"+p.id)}<select class="txt" id="tp-${p.id}" data-tipo>${Object.entries(TIPOS).map(([k,[t]])=>`<option value="${k}" ${p.tipo===k?"selected":""}>${t}</option>`).join("")}</select></div>
     ${cuerpo}
@@ -545,6 +608,7 @@ function enlazarEditor(el){
   el.querySelectorAll("[data-salto]").forEach(s=>s.onchange=()=>{const k=+s.dataset.salto;const o=ops()[k];const cfg={...p.config,saltos:{...(p.config.saltos||{})}};if(s.value)cfg.saltos[o]=s.value;else delete cfg.saltos[o];g({config:cfg})});
   const bif=el.querySelector("[data-bif]");if(bif)bif.onchange=e=>{const cfg={...p.config,bifurcacion:e.target.checked};if(!e.target.checked)delete cfg.saltos;g({config:cfg});pintarPreguntas()};
   el.querySelectorAll("[data-cfg]").forEach(inp=>inp.oninput=inp.onchange=()=>{const v=inp.tagName==="SELECT"?+inp.value:inp.value;g({config:{...p.config,[inp.dataset.cfg]:v}})});
+  const mn=el.querySelector("[data-minimo]");if(mn)mn.oninput=()=>g({config:{...p.config,minimo:Math.max(0,+mn.value||0)}});
   const nps=el.querySelector("[data-nps]");if(nps)nps.onchange=e=>g({config:{...p.config,nps:e.target.checked}});
   el.querySelectorAll("[data-mover]").forEach(b=>b.onclick=async()=>{const j=i+(+b.dataset.mover);if(j<0||j>=S.P.length)return;[S.P[i],S.P[j]]=[S.P[j],S.P[i]];pintarPreguntas();await renumerar()});
   el.querySelector("[data-duplicar]").onclick=()=>insertarPregunta(i,{...p,titulo:p.titulo+" (copia)",config:{...p.config,saltos:undefined}});
@@ -559,7 +623,7 @@ function plantilla(tipo){
   if(tipo==="likert") base.opciones=LIKERT;
   if(tipo==="emociones") base.opciones=EMOCIONES;
   if(tipo==="escala") base.config={min:1,max:10,etiqueta_min:"Nada probable",etiqueta_max:"Muy probable"};
-  if(tipo==="abierta") base.obligatoria=false;
+  if(tipo==="abierta") base.config={minimo:10};
   return base;
 }
 function agregarPregunta(pos,tipo){const ref=S.P[pos];insertarPregunta(pos,{...plantilla(tipo),seccion:ref?ref.seccion:null})}
@@ -586,7 +650,7 @@ function pintarMensajes(){
   const E=S.E,c=cfgE();const cu=$("#cuerpo");
   const campo=(id,titulo,ayuda,valor,ph,area=false)=>`<div class="campo">${etiqueta(titulo,id,ayuda)}${area?`<textarea class="txt" id="${id}" placeholder="${esc(ph)}">${esc(valor)}</textarea>`:`<input class="txt" id="${id}" value="${esc(valor)}" placeholder="${esc(ph)}">`}</div>`;
   cu.innerHTML=`
-  <div class="tarjeta bloque portadilla"><h2>Mensajes que ve el personal</h2><p class="nota">Son los textos que aparecen antes y después de las preguntas. Cámbialos cuando quieras.</p>
+  <div class="tarjeta bloque portadilla" id="t-mensajes"><h2>Mensajes que ve el personal</h2><p class="nota">Son los textos que aparecen antes y después de las preguntas. Cámbialos cuando quieras.</p>
     ${campo("m-tit","Título de la encuesta","al empezar",E.titulo,"Encuesta de clima")}
     ${campo("m-desc","Mensaje de bienvenida","al empezar",E.descripcion||"","Explica para qué es la encuesta",true)}
     ${campo("m-boton","Texto del botón para empezar","",c.boton_inicio||"Comenzar","Comenzar")}
@@ -594,7 +658,7 @@ function pintarMensajes(){
     ${campo("m-gracias","Mensaje de agradecimiento","al terminar",c.mensaje_gracias||"Tu respuesta quedó registrada. Tu opinión ayuda a construir un mejor lugar para trabajar.","Gracias por responder",true)}
     ${campo("m-ya","Mensaje si alguien intenta responder dos veces","",c.mensaje_ya_respondio||"En este dispositivo ya se envió una respuesta. ¡Gracias por participar!","Ya respondiste esta encuesta",true)}
   </div>
-  <div class="tarjeta bloque"><h2>Áreas</h2><p class="nota">Cada área tiene su propio enlace y código QR en <b>Compartir</b>. Quien entra por el QR de su área no tiene que elegirla.</p>
+  <div class="tarjeta bloque" id="t-areas"><h2>Áreas</h2><p class="nota">Cada área tiene su propio enlace y código QR en <b>Compartir</b>. Quien entra por el QR de su área no tiene que elegirla.</p>
     <div id="lista-areas">${S.U.map((u,k)=>`<div class="area-fila" data-u="${u.id}">
       <input class="txt" id="ar-${u.id}" value="${esc(u.nombre)}" aria-label="Nombre del área">${editar("ar-"+u.id)}
       <button class="ico" data-ar-mover="-1" ${k===0?"disabled":""} aria-label="Subir área" title="Subir">${ICO.arriba}</button>
@@ -604,13 +668,14 @@ function pintarMensajes(){
     </div>`).join("")||'<p class="nota">No hay áreas. Agrega la primera.</p>'}</div>
     <div class="fila"><input class="txt grow" id="nueva-area" placeholder="Nombre de la nueva área"><button class="btn" data-agregar-area>+ Agregar área</button></div>
   </div>
-  <div class="tarjeta bloque"><h2>Mi cuenta</h2><p class="nota">Entraste como <b>${esc(S.user&&S.user.email)}</b>. Puedes cambiar tu contraseña aquí.</p>
+  <div class="tarjeta bloque" id="t-cuenta"><h2>Mi cuenta</h2><p class="nota">Entraste como <b>${esc(S.user&&S.user.email)}</b>. Puedes cambiar tu contraseña aquí.</p>
     <div class="fila"><label class="campo grow">Nueva contraseña<input class="txt" type="password" id="clave1" autocomplete="new-password"></label><label class="campo grow">Repite la nueva contraseña<input class="txt" type="password" id="clave2" autocomplete="new-password"></label></div>
     <div><button class="btn" data-clave>Cambiar contraseña</button></div>
   </div>
-  <div class="tarjeta bloque"><h2>Eliminar esta encuesta</h2><p class="nota">Borra la encuesta completa con sus preguntas, áreas y respuestas. No se puede deshacer. Antes, descarga el Excel de respuestas.</p>
+  <div class="tarjeta bloque" id="t-eliminar"><h2>Eliminar esta encuesta</h2><p class="nota">Borra la encuesta completa con sus preguntas, áreas y respuestas. No se puede deshacer. Antes, descarga el Excel de respuestas.</p>
     ${S.borrar==="__encuesta"?`<div class="confirmar">¿Eliminar "${esc(E.titulo)}" y sus ${S.R.length} respuestas? <button class="btn peligro sm" data-enc-si>Sí, eliminar todo</button><button class="btn sm" data-enc-no>Cancelar</button></div>`:`<div><button class="btn peligro" data-enc-borrar>${ICO.borrar} Eliminar encuesta</button></div>`}
   </div>`;
+  pintarLado(ladoResumen()+`<div class="lado-card"><h4>En esta página</h4><div class="indice"><button data-ir="t-mensajes">Mensajes que ve el personal</button><button data-ir="t-areas">Áreas<span>${S.U.length}</span></button><button data-ir="t-cuenta">Mi cuenta</button><button data-ir="t-eliminar">Eliminar encuesta</button></div></div>`);
   const vincular=(id,fn)=>{const el=$("#"+id);if(el)el.oninput=()=>fn(el.value)};
   vincular("m-tit",v=>{E.titulo=v;guardarCampo("encuestas",E.id,{titulo:v});const o=$("#sel-enc option[value='"+E.id+"']");if(o)o.textContent=v});
   vincular("m-desc",v=>{E.descripcion=v;guardarCampo("encuestas",E.id,{descripcion:v})});
@@ -674,6 +739,12 @@ function pintarRespuestas(){
       ${S.borrar==="__resp"?`<div class="confirmar">¿Borrar las ${S.R.length} respuestas? No se puede deshacer. <button class="btn peligro sm" data-limpiar-si>Sí, borrar todo</button><button class="btn sm" data-limpiar-no>Cancelar</button></div>`:`<button class="btn peligro" data-limpiar>${ICO.borrar} Borrar todas las respuestas</button>`}</div>`;
   }
   c.innerHTML=html;
+  const conteoL={};S.R.forEach(r=>{const a=r.unidad||"Sin área";conteoL[a]=(conteoL[a]||0)+1});
+  pintarLado(ladoResumen()+`<div class="lado-card"><h4>Ver resultados de</h4><div class="indice"><button data-filtro="" class="${S.filtro?"":"on"}">Toda la empresa<span>${S.R.length}</span></button>${Object.keys(conteoL).sort().map(a=>`<button data-filtro="${esc(a)}" class="${S.filtro===a?"on":""}">${esc(a)}<span>${conteoL[a]}</span></button>`).join("")}</div></div>
+    <div class="lado-card" style="display:flex;flex-direction:column;gap:8px"><button class="cta sm" data-lado-excel>Descargar Excel</button><button class="btn" data-lado-act>Actualizar</button></div>`);
+  document.querySelectorAll("[data-filtro]").forEach(b=>b.onclick=()=>{S.filtro=b.dataset.filtro;pintarRespuestas();scrollTo({top:0,behavior:"smooth"})});
+  $("[data-lado-excel]").onclick=descargarExcel;
+  $("[data-lado-act]").onclick=()=>c.querySelector("[data-recargar]").click();
   $("#filtro").onchange=e=>{S.filtro=e.target.value;pintarRespuestas()};
   c.querySelector("[data-excel]").onclick=descargarExcel;
   c.querySelector("[data-recargar]").onclick=async()=>{await abrirEncuesta(S.E.id);S.tab="respuestas";pintar();toast("Respuestas actualizadas.")};
