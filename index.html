@@ -14,6 +14,7 @@
 body{font-size:17px}
 .top{display:flex;align-items:center;gap:12px;padding-block:16px 10px}
 .top img{width:30px;height:auto}
+.top img.horiz{display:none}
 .track{flex:1;height:6px;border-radius:3px;background:var(--gris-claro);overflow:hidden}
 .track i{display:block;height:100%;width:0;background:var(--verde);transition:width .6s var(--ease)}
 .count{font-size:13px;font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
@@ -79,28 +80,23 @@ textarea:focus{outline:none;border-color:var(--verde)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .aviso-previa{position:sticky;top:0;z-index:3;background:var(--petroleo);color:var(--blanco);font-size:13px;text-align:center;padding:8px 12px;border-radius:0 0 10px 10px}
 .error{color:var(--rojo);font-size:14px}
-/* ---- computadora: panel de marca a la izquierda ---- */
-.marco{display:none}
-@media (min-width:980px){
-  body{display:grid;grid-template-columns:minmax(360px,40%) minmax(0,1fr);min-height:100%}
-  .marco{display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh;overflow:hidden;background:var(--petroleo);color:#CFE0DF;padding:48px 52px}
-  .marco img{height:50px;width:auto;align-self:flex-start}
-  .marco .eyebrow{color:var(--verde)}
-  .marco .eyebrow::before{background:var(--verde)}
-  .marco h2{color:var(--blanco);font-size:clamp(28px,2.6vw,40px);line-height:1.15;margin-top:10px}
-  .marco ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;overflow:auto;position:relative;z-index:1}
-  .marco li{display:flex;align-items:center;gap:12px;font-size:15px;padding:6px 0;color:#9FBDBB;transition:color .3s}
-  .marco li i{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid #4B7577;display:grid;place-items:center;font-style:normal;font-size:12px;transition:all .3s}
-  .marco li.hecha{color:#CFE0DF}.marco li.hecha i{background:var(--verde);border-color:var(--verde);color:var(--petroleo)}
-  .marco li.actual{color:var(--blanco);font-weight:500}.marco li.actual i{border-color:var(--verde);box-shadow:0 0 0 4px rgba(178,210,52,.25)}
-  .marco .l1,.marco .l2{position:absolute;height:1.5px;background:var(--verde);transform:rotate(-27deg);transform-origin:left;opacity:.9}
-  .marco .l1{width:45%;right:-10%;bottom:12%}.marco .l2{width:35%;right:-12%;top:5%}
-  .marco .pie-marco{margin-top:auto;font-size:13px;color:#9FBDBB;position:relative;z-index:1}
-  .app{max-width:680px;width:100%;padding-inline:56px;justify-self:center}
-  .stage{align-content:center}
-  .screen{padding-block:5vh 24px}
-  .top img,.portada .logo,.diagonal{display:none!important}
-  .barra-marca{width:22%}
+/* ---- computadora: pregunta centrada en tarjeta, al estilo Forms ---- */
+.cab-form{display:none}
+@media (min-width:760px){
+  body{background:#EEF1E8}
+  .cab-form{display:block;background:var(--petroleo);height:132px;position:absolute;inset:0 0 auto 0;z-index:-1;overflow:hidden}
+  .cab-form::after{content:"";position:absolute;right:-60px;top:70px;width:420px;height:1.5px;background:var(--verde);transform:rotate(-27deg);transform-origin:left}
+  .app{max-width:760px;padding-inline:24px;padding-block:28px 60px}
+  .top{background:var(--blanco);border-radius:16px 16px 0 0;padding:18px 28px;border-bottom:1px solid var(--gris-claro)}
+  .top.oculto{visibility:visible}
+  .top.oculto .track,.top.oculto .count{visibility:hidden}
+  .top img.iso{display:none}
+  .top img.horiz{display:block;width:auto;height:34px}
+  .stage{background:var(--blanco);border-radius:0 0 16px 16px;border-top:6px solid var(--verde);padding:8px 44px 28px;box-shadow:0 12px 34px rgba(0,60,64,.08);flex:none;min-height:0}
+  .screen{padding-block:26px 6px}
+  .portada .logo,.diagonal{display:none!important}
+  .barra-marca{width:24%}
+  .aviso-previa{border-radius:10px;margin-bottom:10px}
 }
 /* aviso rojo tipo SweetAlert */
 .alerta-fondo{position:fixed;inset:0;background:rgba(0,40,43,.45);z-index:50;display:grid;place-items:center;padding:20px;animation:fondoIn .2s ease both}
@@ -126,12 +122,12 @@ h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus{outline:none}
 </style>
 </head>
 <body>
-<aside class="marco" id="marco" aria-hidden="true"><span class="l1"></span><span class="l2"></span><img src="logo-horizontal-blanco.png" alt=""><div><div class="eyebrow">Encuesta de clima</div><h2 id="marco-tit">Garnier &amp; Garnier</h2></div><ol id="marco-secs"></ol><p class="pie-marco">Tus respuestas se manejan con confidencialidad.</p></aside>
+<div class="cab-form" aria-hidden="true"></div>
 <div class="diagonal" aria-hidden="true"></div>
 <div class="app">
   <div id="previa" hidden></div>
   <div class="top oculto" id="top">
-    <img src="isotipo.png" alt="Garnier">
+    <img class="iso" src="isotipo.png" alt="Garnier"><img class="horiz" src="logo-horizontal.png" alt="Garnier, Enhancing Land">
     <div class="track"><i id="barra"></i></div>
     <div class="count" id="count"></div>
   </div>
@@ -257,15 +253,6 @@ function progreso(){
   const i=pant.tipo==="pregunta"||pant.tipo==="seccion"?pant.i:pant.tipo==="unidad"?0:P.length;
   document.getElementById("barra").style.width=(P.length?Math.round(i/P.length*100):0)+"%";
   document.getElementById("count").textContent=pant.tipo==="pregunta"?(pant.i+1)+" / "+P.length:"";
-  marco();
-}
-function marco(){
-  const t=document.getElementById("marco-tit");if(t&&E)t.textContent=E.titulo;
-  const ol=document.getElementById("marco-secs");if(!ol||!E)return;
-  const lista=secciones().filter(Boolean);
-  const actual=(pant.tipo==="pregunta"||pant.tipo==="seccion")?(P[pant.i].seccion||""):null;
-  const ia=pant.tipo==="gracias"?lista.length:actual===null?-1:lista.indexOf(actual);
-  ol.innerHTML=lista.map((x,k)=>`<li class="${k<ia?"hecha":k===ia?"actual":""}"><i>${k<ia?"✓":k+1}</i>${esc(x)}</li>`).join("");
 }
 
 /* ---------- pantallas ---------- */

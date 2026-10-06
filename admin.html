@@ -134,6 +134,7 @@ textarea.titq{font-size:17px;min-height:56px;background:#F7F8F4}
 .switch input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--blanco);transition:transform .2s var(--ease)}
 .switch input:checked{background:var(--verde)}
 .switch input:checked::after{transform:translateX(16px)}
+.ubicacion{background:#F7F8F4;border:1px solid var(--gris-claro);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
 .confirmar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#FBEDEA;border-radius:10px;padding:10px 12px;font-size:14px;color:var(--rojo)}
 .agregar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:20px}
 .menu-tipos{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:10px}
@@ -560,9 +561,19 @@ function editorHTML(p,i){
     <textarea class="txt titq" id="tq-${p.id}" data-titulo rows="2">${esc(p.titulo)}</textarea>
     <div class="campo">${etiqueta("Tipo de respuesta","tp-"+p.id)}<select class="txt" id="tp-${p.id}" data-tipo>${Object.entries(TIPOS).map(([k,[t]])=>`<option value="${k}" ${p.tipo===k?"selected":""}>${t}</option>`).join("")}</select></div>
     ${cuerpo}
-    <div class="fila"><div class="campo grow">${etiqueta("Sección","sc-"+p.id,"agrupa preguntas")}<input class="txt" id="sc-${p.id}" data-seccion list="dl-secs" value="${esc(p.seccion||"")}" placeholder="Sin sección"></div>
-      <div class="campo grow">${etiqueta("Aclaración debajo de la pregunta","ay-"+p.id,"opcional")}<input class="txt" id="ay-${p.id}" data-ayuda value="${esc(p.ayuda||"")}" placeholder="Por ejemplo: piensa en los últimos 12 meses"></div></div>
-    <datalist id="dl-secs">${secs.map(s=>`<option value="${esc(s)}">`).join("")}</datalist>
+    <div class="campo">${etiqueta("Aclaración debajo de la pregunta","ay-"+p.id,"opcional")}<input class="txt" id="ay-${p.id}" data-ayuda value="${esc(p.ayuda||"")}" placeholder="Por ejemplo: piensa en los últimos 12 meses"></div>
+    <div class="ubicacion">
+      <div class="etq"><span><b>Ubicación de la pregunta</b> · elige la sección y el lugar dentro de ella</span></div>
+      <div class="fila">
+        <label class="campo grow">Sección<select class="txt" id="ub-sec-${p.id}" data-ub-sec>
+          ${secs.map(x=>`<option value="${esc(x)}" ${p.seccion===x?"selected":""}>${esc(x)}</option>`).join("")}
+          <option value="" ${!p.seccion?"selected":""}>Sin sección</option>
+          <option value="__nueva">+ Crear una sección nueva…</option></select></label>
+        <label class="campo grow">Lugar dentro de la sección<select class="txt" id="ub-pos-${p.id}" data-ub-pos></select></label>
+      </div>
+      <input class="txt" id="ub-nueva-${p.id}" data-ub-nueva placeholder="Nombre de la sección nueva" hidden>
+      <div class="fila" style="align-items:center"><button class="cta sm" data-ub-guardar>Guardar ubicación</button><span class="nota" data-ub-nota></span></div>
+    </div>
     <div class="fila" style="gap:20px">
       <label class="switch"><input type="checkbox" data-obl ${p.obligatoria?"checked":""}> Respuesta obligatoria</label>
       ${usaSaltos?`<label class="switch"><input type="checkbox" data-bif ${conSaltos?"checked":""}> Llevar a otra pregunta según la respuesta</label>`:""}
@@ -582,8 +593,7 @@ function enlazarEditor(el){
   const p=S.P.find(x=>x.id===el.dataset.id);const i=S.P.indexOf(p);
   const g=c=>{Object.assign(p,c);guardarCampo("preguntas",p.id,c)};
   el.querySelector("[data-titulo]").oninput=e=>g({titulo:e.target.value});
-  el.querySelector("[data-seccion]").oninput=e=>g({seccion:e.target.value.trim()||null});
-  el.querySelector("[data-seccion]").onchange=()=>pintarPreguntas();
+  enlazarUbicacion(el,p);
   el.querySelector("[data-ayuda]").oninput=e=>g({ayuda:e.target.value||null});
   el.querySelector("[data-obl]").onchange=e=>g({obligatoria:e.target.checked});
   el.querySelector("[data-tipo]").onchange=e=>{
@@ -616,6 +626,42 @@ function enlazarEditor(el){
   const si=el.querySelector("[data-borrar-si]");if(si)si.onclick=()=>borrarPregunta(p);
   const no=el.querySelector("[data-borrar-no]");if(no)no.onclick=()=>{S.borrar=null;pintarPreguntas()};
   el.querySelector("[data-listo]").onclick=()=>{S.abierta=null;S.borrar=null;pintarPreguntas()};
+}
+/* --- ubicación: sección + lugar dentro de la sección --- */
+const ORDINAL=["Primera","Segunda","Tercera","Cuarta","Quinta","Sexta","Séptima","Octava","Novena","Décima"];
+function enlazarUbicacion(el,p){
+  const selSec=el.querySelector("[data-ub-sec]"),selPos=el.querySelector("[data-ub-pos]"),nueva=el.querySelector("[data-ub-nueva]"),nota=el.querySelector("[data-ub-nota]");
+  const seccionElegida=()=>selSec.value==="__nueva"?(nueva.value.trim()||"__nueva"):(selSec.value||null);
+  const llenar=()=>{
+    nueva.hidden=selSec.value!=="__nueva";
+    const sec=seccionElegida();
+    const otras=S.P.filter(q=>q.id!==p.id&&(q.seccion||null)===(sec==="__nueva"?"__ninguna__":sec));
+    const actual=(p.seccion||null)===sec?S.P.filter(q=>(q.seccion||null)===sec).indexOf(p):otras.length;
+    selPos.innerHTML=otras.map((q,k)=>`<option value="${k}" ${k===actual?"selected":""}>${ORDINAL[k]||(k+1)+".ª"} pregunta · antes de "${esc(q.titulo.slice(0,40))}${q.titulo.length>40?"…":""}"</option>`).join("")
+      +`<option value="${otras.length}" ${actual>=otras.length?"selected":""}>${otras.length?"Al final de la sección":"Primera pregunta de la sección"}</option>`;
+    nota.textContent="";
+  };
+  selSec.onchange=()=>{llenar();if(selSec.value==="__nueva"){nueva.focus()}};
+  nueva.oninput=()=>{nota.textContent=""};
+  llenar();
+  el.querySelector("[data-ub-guardar]").onclick=async()=>{
+    let sec=seccionElegida();
+    if(sec==="__nueva"){nueva.focus();nota.textContent="Escribe el nombre de la sección nueva.";return}
+    const k=+selPos.value;
+    const resto=S.P.filter(q=>q.id!==p.id);
+    const otras=resto.filter(q=>(q.seccion||null)===sec);
+    let idx;
+    if(!otras.length) idx=resto.length;
+    else if(k<otras.length) idx=resto.indexOf(otras[k]);
+    else idx=resto.indexOf(otras[otras.length-1])+1;
+    resto.splice(idx,0,p);S.P=resto;
+    const cambioSec=(p.seccion||null)!==sec;p.seccion=sec;
+    guardando("Guardando…");
+    if(cambioSec){const {error}=await sb.from("preguntas").update({seccion:sec}).eq("id",p.id);if(error)return fallo(error)}
+    await renumerar();guardando("Todos los cambios se guardaron");
+    pintarPreguntas();
+    const n=S.P.indexOf(p)+1;toast(`Pregunta ubicada${sec?" en "+sec:""} como la número ${n}.`);
+  };
 }
 function plantilla(tipo){
   const base={titulo:"Escribe aquí tu pregunta",tipo,obligatoria:true,ayuda:null,opciones:[],config:{}};
