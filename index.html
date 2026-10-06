@@ -63,10 +63,12 @@ h2{font-size:clamp(21px,5.4vw,26px);line-height:1.28}
 .extremos{display:flex;justify-content:space-between;gap:12px;font-size:13px}
 .emos{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
 .emo{appearance:none;border:1.5px solid var(--gris-claro);background:var(--blanco);border-radius:16px;padding:14px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:14px;text-align:center;transition:transform .2s var(--ease),border-color .2s,background .2s}
-.emo span{font-size:32px;line-height:1;transition:transform .35s var(--ease)}
-.emo:hover span{transform:scale(1.15) rotate(-6deg)}
+.emo .emo-ic{width:44px;height:44px;border-radius:50%;background:var(--verde-suave);color:var(--petroleo);display:grid;place-items:center;transition:transform .35s var(--ease),background .25s}
+.emo .emo-ic svg{width:26px;height:26px}
+.emo.sel .emo-ic{background:var(--verde)}
+.emo:hover .emo-ic{transform:scale(1.15) rotate(-6deg)}
 .emo.sel{border-color:var(--verde);background:var(--verde-suave);color:var(--petroleo);font-weight:500}
-.emo.sel span{animation:pop .5s var(--ease)}
+.emo.sel .emo-ic{animation:pop .5s var(--ease)}
 @keyframes pop{40%{transform:scale(1.4)}100%{transform:scale(1.1)}}
 textarea{width:100%;min-height:150px;resize:vertical;border:1.5px solid var(--gris-claro);border-radius:16px;padding:14px 16px;color:var(--petroleo);background:var(--blanco);transition:border-color .2s}
 textarea:focus{outline:none;border-color:var(--verde)}
@@ -138,6 +140,7 @@ h1[tabindex="-1"]:focus,h2[tabindex="-1"]:focus{outline:none}
 <canvas id="confeti" hidden></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="lucide.min.js"></script>
 <script src="config.js"></script>
 <script>
 "use strict";
@@ -145,7 +148,7 @@ const sb = supabase.createClient(CLIMA_CONFIG.url, CLIMA_CONFIG.key);
 const CHECK='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6.3 4.8 9 10 3" stroke="#003C40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const FLECHA='<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const PALOMA='<svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M10 21 17 28 31 13" stroke="#003C40" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const EMOJI={feliz:"😊",comprometido:"🤝",comprometida:"🤝",motivado:"🚀",motivada:"🚀",satisfecho:"🙂",satisfecha:"🙂",indiferente:"😐",decepcionado:"😞",decepcionada:"😞",frustrado:"😣",frustrada:"😣",aburrido:"🥱",aburrida:"🥱",estresado:"😰",estresada:"😰",enfadado:"😠",enfadada:"😠",enojado:"😠",tranquilo:"😌",tranquila:"😌",orgulloso:"🏆",orgullosa:"🏆",cansado:"😩",cansada:"😩",ansioso:"😟",ansiosa:"😟",agradecido:"🙏",agradecida:"🙏"};
+const ICONO_EMO={feliz:"laugh",comprometido:"handshake",comprometida:"handshake",motivado:"rocket",motivada:"rocket",satisfecho:"smile",satisfecha:"smile",indiferente:"meh",decepcionado:"frown",decepcionada:"frown",frustrado:"annoyed",frustrada:"annoyed",aburrido:"hourglass",aburrida:"hourglass",estresado:"zap",estresada:"zap",enfadado:"angry",enfadada:"angry",enojado:"angry",enojada:"angry",tranquilo:"leaf",tranquila:"leaf",orgulloso:"trophy",orgullosa:"trophy",agradecido:"heart",agradecida:"heart"};
 const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const params=new URLSearchParams(location.search);
 const PREVIA=params.get("previa");               // id de encuesta (solo con sesión de administradora)
@@ -294,7 +297,7 @@ function render(s){
       return cab+`<div class="escala" style="grid-template-columns:repeat(${cols},1fr)">${nums.map(k=>`<button class="n ${v===k?"sel":v!==undefined&&k<v?"rango":""}" data-n="${k}" aria-label="${k}">${k}</button>`).join("")}</div>
         <div class="extremos"><span>${min} · ${esc(c.etiqueta_min||"")}</span><span>${max} · ${esc(c.etiqueta_max||"")}</span></div>`+pieHTML(listo,textoSig);
     }
-    case "emociones": return cab+`<div class="emos">${ops.map(o=>`<button class="emo ${v===o?"sel":""}" data-v="${esc(o)}"><span>${EMOJI[o.toLowerCase().trim()]||"💬"}</span>${esc(o)}</button>`).join("")}</div>`+pieHTML(listo,textoSig);
+    case "emociones": return cab+`<div class="emos">${ops.map(o=>`<button class="emo ${v===o?"sel":""}" data-v="${esc(o)}"><span class="emo-ic"><i data-lucide="${ICONO_EMO[o.toLowerCase().trim()]||"message-circle"}"></i></span>${esc(o)}</button>`).join("")}</div>`+pieHTML(listo,textoSig);
     case "abierta":{const min=minimoTexto(p);
       return cab+`<textarea id="txt-${p.id}" maxlength="1000" aria-label="Tu respuesta" placeholder="Escribe tu respuesta con tus propias palabras…">${esc(v||"")}</textarea>
       <div class="contador">${min?`<span class="minimo" data-min>Mínimo ${min} caracteres</span>`:"<span></span>"}<span><span data-c>${(v||"").length}</span> / 1000</span></div>`+pieHTML(true,textoSig);}
@@ -406,6 +409,7 @@ function confeti(){
   const ps=Array.from({length:150},()=>({x:W*(.2+Math.random()*.6),y:H*.35,vx:(Math.random()-.5)*14*d,vy:(-Math.random()*16-4)*d,w:(5+Math.random()*7)*d,h:(3+Math.random()*4)*d,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:cols[Math.random()*4|0]}));
   let t=0;(function f(){x.clearRect(0,0,W,H);ps.forEach(p=>{p.vy+=.45*d;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()});if(++t<220)requestAnimationFrame(f);else c.hidden=true})();
 }
+new MutationObserver(()=>{clearTimeout(window.__ic);window.__ic=setTimeout(()=>{try{if(window.lucide&&document.querySelector("i[data-lucide]"))lucide.createIcons({attrs:{"stroke-width":1.7}})}catch(e){}},0)}).observe(document.documentElement,{childList:true,subtree:true});
 cargar();
 </script>
 </body>
